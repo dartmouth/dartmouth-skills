@@ -1,0 +1,47 @@
+---
+type: Readme
+title: Dartmouth skills
+description: Agent Skills for Dartmouth services, packaged for npx skills and Claude plugin marketplaces.
+tags: [skills, dartmouth]
+generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-05T09:09:52-04:00 }
+status: draft
+---
+
+# Dartmouth skills
+
+Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmouth services. Every markdown file carries [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md) frontmatter, so each file records where it came from and when it should be refreshed.
+
+## Skills
+
+| Skill | What it does |
+|---|---|
+| [`dartmouth-chat`](skills/dartmouth-chat/SKILL.md) | Helps end users with chat.dartmouth.edu: access, credits, models, privacy, features, Workspace, the API, and coding-agent setup. |
+
+## Install
+
+```bash
+# Any agent (Claude Code, Codex, Cursor, Copilot, …) → ./.agents/skills/
+npx skills add <org>/dartmouth-skills --list
+npx skills add <org>/dartmouth-skills@dartmouth-chat
+npx skills add <org>/dartmouth-skills@dartmouth-chat -g   # global: ~/.agents/skills/
+
+# Claude Code plugin marketplace
+/plugin marketplace add <org>/dartmouth-skills
+/plugin install dartmouth-skills@dartmouth-skills
+```
+
+Without the CLI, copy `skills/<name>/` into `.agents/skills/`, and symlink it into `.claude/skills/` for Claude Code.
+
+## Layout
+
+```
+.claude-plugin/        marketplace.json + plugin.json (Claude plugin distribution)
+skills/
+  index.md             OKF catalog (okf_version: "0.2")
+  log.md               OKF change log
+  <skill>/
+    SKILL.md           frontmatter: Agent Skills (name, description) + OKF fields
+    references/        long-form docs the skill loads on demand
+```
+
+See [AGENTS.md](AGENTS.md) for authoring rules.

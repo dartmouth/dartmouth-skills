@@ -1,0 +1,8 @@
+{
+  "name": "dartmouth-skills",
+  "version": "0.1.0",
+  "description": "Agent Skills for Dartmouth Research Computing & Data services (Dartmouth Chat, and more to come).",
+  "author": { "name": "Dartmouth Research Computing & Data", "email": "research.computing@dartmouth.edu" },
+  "homepage": "https://rc.dartmouth.edu/ai/",
+  "keywords": ["dartmouth", "dartmouth-chat", "rcd", "skills"]
+}

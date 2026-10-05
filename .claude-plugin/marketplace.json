@@ -1,0 +1,11 @@
+{
+  "name": "dartmouth-skills",
+  "owner": { "name": "Dartmouth Research Computing & Data", "email": "research.computing@dartmouth.edu" },
+  "plugins": [
+    {
+      "name": "dartmouth-skills",
+      "source": "./",
+      "description": "Agent Skills for Dartmouth RCD services, starting with Dartmouth Chat."
+    }
+  ]
+}
