@@ -1,11 +1,4 @@
----
-type: Readme
-title: Dartmouth skills
-description: Agent Skills for Dartmouth services, packaged for npx skills and Claude plugin marketplaces.
-tags: [skills, dartmouth]
-generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-05T09:09:52-04:00 }
-status: draft
----
+
 
 # Dartmouth skills
 
