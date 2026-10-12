@@ -9,11 +9,14 @@ Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmo
 | Skill | What it does |
 |---|---|
 | [`dartmouth-chat`](skills/dartmouth-chat/SKILL.md) | Helps end users with chat.dartmouth.edu: access, credits, models, privacy, features, Workspace, the API, and coding-agent setup. |
+| [`dartmouth-branding`](skills/dartmouth-branding/SKILL.md) | Helps users apply Dartmouth College's official brand and design standards when creating communications. |
 
 ## Install
 
+(change dartmouth-chat to a different skill above if you want)
+
 ```bash
-# Any agent (Claude Code, Codex, Cursor, Copilot, …) → ./.agents/skills/
+# Any agent (Claude Code, Codex, Cursor, Copilot, …) → ./.agents/skills/ 
 npx skills add <org>/dartmouth-skills --list
 npx skills add <org>/dartmouth-skills@dartmouth-chat
 npx skills add <org>/dartmouth-skills@dartmouth-chat -g   # global: ~/.agents/skills/
