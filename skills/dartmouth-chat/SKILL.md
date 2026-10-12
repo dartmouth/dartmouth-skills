@@ -6,7 +6,7 @@ title: Dartmouth Chat — end-user guide
 resource: https://chat.dartmouth.edu
 tags: [dartmouth-chat, open-webui, llm, api, end-user, rcd]
 generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-05T09:09:52-04:00 }
-verified: Tivon Luker
+verified: { by: human:tivon.n.luker, at: 2026-10-12T17:09:45-04:00 }
 stale_after: 2027-01-05T00:00:00Z
 status: stable
 sources:

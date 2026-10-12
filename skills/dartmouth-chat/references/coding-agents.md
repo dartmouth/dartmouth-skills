@@ -4,7 +4,6 @@ title: Connecting coding agents to the Dartmouth Chat API
 description: Full client configs for Claude Code, OpenCode, Kilo Code and Mistral Vibe against chat.dartmouth.edu/api.
 tags: [dartmouth-chat, api, claude-code, opencode, kilo-code, mistral-vibe]
 generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-05T09:09:52-04:00 }
-verified:
 stale_after: 2027-01-05T00:00:00Z
 status: draft
 sources:

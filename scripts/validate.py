@@ -10,6 +10,7 @@ import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RESERVED = {"index.md", "log.md"}
+NO_FRONTMATTER = {"README.md"}  # kept clean so GitHub renders it
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 errors, warnings = [], []
 
@@ -27,6 +28,9 @@ for md in sorted(ROOT.rglob("*.md")):
         continue
     rel = md.relative_to(ROOT)
     fm, body = frontmatter(md)
+
+    if md.name in NO_FRONTMATTER:
+        continue
 
     if md.name in RESERVED:
         continue  # index.md / log.md: no frontmatter required (OKF §8–9)
