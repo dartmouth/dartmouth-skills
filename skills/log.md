@@ -1,6 +1,8 @@
 # Skills Update Log
 
 ## 2026-10-13
+* **Verification**: [research-container-deployment](/research-container-deployment/SKILL.md) and its walkthrough reviewed by human:f003q1r (status: stable).
+* **Update**: [research-container-deployment](/research-container-deployment/SKILL.md): image builders require Dartmouth GitHub org membership; added account setup and Dashboard invitation-request steps.
 * **Update**: [research-container-deployment](/research-container-deployment/SKILL.md): HTTPS `<appname>.dartmouth.edu` addresses come from a Load Balancing Management TDX request; the `-app.c.dartmouth.edu:<port>` address always exists.
 * **Creation**: Added [research-container-deployment](/research-container-deployment/SKILL.md), built from the RCD Dashboard workshop page and Dashboard UI screenshots (status: draft, unverified).
 * **Creation**: Added [references/todo-walkthrough.md](/research-container-deployment/references/todo-walkthrough.md) with the workshop's Todo app example.

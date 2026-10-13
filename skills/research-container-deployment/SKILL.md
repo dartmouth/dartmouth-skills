@@ -1,13 +1,14 @@
 ---
 name: research-container-deployment
-description: Help Dartmouth researchers deploy containerized web applications (Streamlit, Flask, Shiny, APIs, etc.) through the Dartmouth Computing Dashboard (dashboard.dartmouth.edu). Use when someone asks about creating a Dashboard project, free-tier vs billed projects, creating a PostgreSQL/MySQL/MariaDB/SQL Server database instance, building a container image from a GitHub repo (Container Image Builders, service-account read access, release webhook), checking image builds and scans, filling in a Container Deploy (image, environment variables, secrets, ports, CPU/memory), finding the app URL, Kubernetes Deploy environments, Rancher, or getting an HTTPS appname.dartmouth.edu address on the load balancer.
+description: Help Dartmouth researchers deploy containerized web applications (Streamlit, Flask, Shiny, APIs, etc.) through the Dartmouth Computing Dashboard (dashboard.dartmouth.edu). Use when someone asks about creating a Dashboard project, free-tier vs billed projects, creating a PostgreSQL/MySQL/MariaDB/SQL Server database instance, joining the Dartmouth GitHub organization, building a container image from a GitHub repo (Container Image Builders, service-account read access, release webhook), checking image builds and scans, filling in a Container Deploy (image, environment variables, secrets, ports, CPU/memory), finding the app URL, Kubernetes Deploy environments, Rancher, or getting an HTTPS appname.dartmouth.edu address on the load balancer.
 type: Agent Skill
 title: Research container deployment on Dartmouth Dashboard — end-user guide
 resource: https://dashboard.dartmouth.edu
 tags: [dartmouth-dashboard, containers, kubernetes, docker, podman, database, streamlit, end-user, rcd]
 generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-13T08:45:00-04:00 }
+verified: { by: human:f003q1r, at: 2026-10-13T08:51:49-04:00 }
 stale_after: 2027-01-13T00:00:00Z
-status: draft
+status: stable
 sources:
   - id: rc-workshop
     resource: https://rcweb.dartmouth.edu/~f003q1r/workshops/dashboard/
@@ -17,6 +18,16 @@ sources:
     resource: https://services.dartmouth.edu/TDClient/1806/Portal/Requests/Service/55228/Load-Balancing-Management/Request
     title: Load Balancing Management request (TDX)
     author: team:dartmouth-itc
+  - id: gh-create-account
+    resource: https://dartmouth.github.io/get-started-on-dartmouth-github/create-account/
+    title: Get Started on Dartmouth GitHub — Create Account
+  - id: gh-add-email
+    resource: https://dartmouth.github.io/get-started-on-dartmouth-github/add-dartmouth-email/
+    title: Get Started on Dartmouth GitHub — Add Dartmouth Email
+  - id: dash-github
+    resource: https://dashboard.dartmouth.edu/github/invitation_request/
+    title: Dashboard — GitHub Invitation Request
+    author: team:dartmouth-rcd
   - id: dash-project
     resource: https://dashboard.dartmouth.edu/project/
     title: Dashboard — Project Console and Create Project form
@@ -36,7 +47,7 @@ sources:
 
 # Deploying research containers on Dartmouth Dashboard
 
-The Dartmouth Computing Dashboard (https://dashboard.dartmouth.edu) lets Dartmouth users create databases and run containerized applications on Dartmouth's Kubernetes clusters without managing Kubernetes directly. It is run by Research Computing & Data (RCD).
+The Dartmouth Computing Dashboard (https://dashboard.dartmouth.edu) lets Dartmouth users create databases and run containerized applications on Dartmouth's Kubernetes clusters without managing Kubernetes directly. It is run by Infrastructure Services.
 
 The Dashboard has three sections that matter here:
 
@@ -55,7 +66,7 @@ Form labels and limits below were read from the Dashboard UI in October 2026. If
 - **Test locally before deploying.** If the container doesn't run with `podman run` / `docker run` on the user's laptop, it won't run on the cluster.
 - **Sensitive data or logins:** apps that take usernames, passwords or other sensitive input need HTTPS. Have the user request an `https://<appname>.dartmouth.edu` address on the load balancer (see §4).[^lb-request]
 - **Regulated data** (HIPAA, FERPA, etc.): don't assume the Dashboard is approved. Have the user contact research.computing@dartmouth.edu first.
-- **Support:** research.computing@dartmouth.edu
+- **Support:** https://services.dartmouth.edu/TDClient/1806/Portal/Requests/Service/55225/Container-Hosting-and-Management/Request
 
 ## The whole path at a glance
 
@@ -116,6 +127,7 @@ Skip this if the user is deploying an existing public image (e.g. `ghcr.io/dartm
 
 **Prerequisites:**[^dash-compute]
 
+- **Membership in the Dartmouth GitHub organization** (https://github.com/dartmouth). See *Joining Dartmouth GitHub* below.
 - Source code **and a `Dockerfile`** in a GitHub repository in one of the Dartmouth GitHub organizations.
 - The image builds and runs locally:
 
@@ -124,7 +136,17 @@ Skip this if the user is deploying an existing public image (e.g. `ghcr.io/dartm
   podman run -p 8501:8501 -e SOME_VAR=value myapp
   ```
 
-**One-time GitHub setup** (also shown under Compute › Container Image Builders › **SETUP GITHUB**):[^dash-compute]
+**Joining Dartmouth GitHub** (one time per person):
+
+1. **Get a GitHub account set up for Dartmouth.**
+   - No GitHub account yet: create one, ideally with your `name@dartmouth.edu` address: https://dartmouth.github.io/get-started-on-dartmouth-github/create-account/[^gh-create-account]
+   - Already have one (personal is fine; GitHub recommends one account per person): add **both** `name@dartmouth.edu` and `netid@dartmouth.edu` under GitHub Settings › Emails and verify each: https://dartmouth.github.io/get-started-on-dartmouth-github/add-dartmouth-email/[^gh-add-email] The NetID address is what makes Dartmouth SSO work.
+2. **Request an invitation:** in the Dashboard, open GitHub › Invitation Request (https://dashboard.dartmouth.edu/github/invitation_request/) and click **REQUEST INVITATION**.[^dash-github]
+3. Within a few minutes an email arrives at your Dartmouth account. Follow it to accept the invitation.
+
+Other Dartmouth GitHub organizations are invite-only; ask that org's owner to add you.[^gh-add-email]
+
+**One-time GitHub setup per repository** (also shown under Compute › Container Image Builders › **SETUP GITHUB**):[^dash-compute]
 
 *Read access for the build service account:*
 
@@ -147,6 +169,7 @@ Skip this if the user is deploying an existing public image (e.g. `ghcr.io/dartm
 
 **Build failed?** Open the Build log. Common causes:
 
+- The repo isn't in a Dartmouth GitHub organization, or you aren't a member yet.
 - The service account wasn't added, or was added to a different repo.
 - The Dockerfile/Context Path doesn't match the repo layout.
 - The Dockerfile only works locally (e.g. it copies files that are in `.gitignore`, or depends on a local base image).
@@ -217,6 +240,9 @@ The Compute console's **Other Resources** panel links to beginner Docker and Kub
 
 [^rc-workshop]: Deploying a Containerized Web Application with Dartmouth Dashboard (workshop)
 [^lb-request]: Load Balancing Management request (TDX)
+[^gh-create-account]: Get Started on Dartmouth GitHub — Create Account
+[^gh-add-email]: Get Started on Dartmouth GitHub — Add Dartmouth Email
+[^dash-github]: Dashboard — GitHub Invitation Request
 [^dash-project]: Dashboard — Project Console and Create Project form
 [^dash-database]: Dashboard — Database Console and Create Instance form
 [^dash-compute]: Dashboard — Compute Console (builders, images, Container Deploy, Kubernetes Deploy)

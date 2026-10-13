@@ -4,8 +4,9 @@ title: Worked example — deploying the Todo Streamlit app with a PostgreSQL dat
 description: End-to-end workshop walkthrough for the research-container-deployment skill, using the dartmouth/todo-demo Streamlit app.
 tags: [dartmouth-dashboard, streamlit, postgresql, podman, workshop]
 generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-13T08:45:00-04:00 }
+verified: { by: human:f003q1r, at: 2026-10-13T08:51:49-04:00 }
 stale_after: 2027-01-13T00:00:00Z
-status: draft
+status: stable
 sources:
   - id: rc-workshop
     resource: https://rcweb.dartmouth.edu/~f003q1r/workshops/dashboard/
@@ -71,7 +72,7 @@ podman run -p 8501:8501 -e USER_NAME="Your Name" --name todo todo
 
 ## 4. Build your own image (skip for the workshop)
 
-Push the code and Dockerfile to a repo in a Dartmouth GitHub org. Add the `f0068fg` read collaborator and the release webhook (see SKILL.md §3). Create a Container Image Builder, publish a GitHub release, then copy the image **Location** from Compute › Container Images.
+Join the Dartmouth GitHub organization if you haven't (Dashboard › GitHub › Invitation Request; see SKILL.md §3). Push the code and Dockerfile to a repo in a Dartmouth GitHub org. Add the `f0068fg` read collaborator and the release webhook (see SKILL.md §3). Create a Container Image Builder, publish a GitHub release, then copy the image **Location** from Compute › Container Images.
 
 ## 5. Container Deploy
 
