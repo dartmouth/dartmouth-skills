@@ -4,7 +4,7 @@ title: AGENTS.md — repository guide
 description: Rules for agents adding, editing, or reviewing skills in the dartmouth-skills repo.
 tags: [agents, conventions, skills, okf]
 generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-05T09:09:52-04:00 }
-verified: { by: human:tivon.n.luker, at: 2026-10-12T17:09:45-04:00 }
+verified: { by: human:f003q1r, at: 2026-10-12T17:09:45-04:00 }
 stale_after: 2027-01-05T00:00:00Z
 status: stable
 sources:

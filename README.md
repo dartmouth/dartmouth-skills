@@ -10,6 +10,7 @@ Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmo
 |---|---|
 | [`dartmouth-chat`](skills/dartmouth-chat/SKILL.md) | Helps end users with chat.dartmouth.edu: access, credits, models, privacy, features, Workspace, the API, and coding-agent setup. |
 | [`dartmouth-branding`](skills/dartmouth-branding/SKILL.md) | Helps users apply Dartmouth College's official brand and design standards when creating communications. |
+| [`research-container-deployment`](skills/research-container-deployment/SKILL.md) | Helps researchers deploy containerized web apps and databases on the Dartmouth Computing Dashboard. |
 
 ## Install
 
