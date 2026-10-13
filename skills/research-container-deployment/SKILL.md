@@ -1,12 +1,12 @@
 ---
 name: research-container-deployment
-description: Help Dartmouth researchers deploy containerized web applications (Streamlit, Flask, Shiny, APIs, etc.) through the Dartmouth Computing Dashboard (dashboard.dartmouth.edu). Use when someone asks about creating a Dashboard project, free-tier vs billed projects, creating a PostgreSQL/MySQL/MariaDB/SQL Server database instance, joining the Dartmouth GitHub organization, building a container image from a GitHub repo (Container Image Builders, service-account read access, release webhook), checking image builds and scans, filling in a Container Deploy (image, environment variables, secrets, ports, CPU/memory), finding the app URL, Kubernetes Deploy environments, Rancher, or getting an HTTPS appname.dartmouth.edu address on the load balancer.
+description: Help Dartmouth researchers deploy containerized web applications (Streamlit, Flask, Shiny, APIs, etc.) through the Dartmouth Computing Dashboard (dashboard.dartmouth.edu). Use when someone asks about creating a Dashboard project, free-tier vs billed projects, creating a PostgreSQL/MySQL/MariaDB/SQL Server database instance, joining the Dartmouth GitHub organization, building a container image from a GitHub repo (Container Image Builders, service-account read access, release webhook), checking image builds and scans, filling in a Container Deploy (image, environment variables, secrets, ports, CPU/memory), finding the app URL, Kubernetes Deploy (the k8s-<name> GitHub manifests repo, environments, Argo CD sync, Rancher), or getting an HTTPS appname.dartmouth.edu address on the load balancer.
 type: Agent Skill
 title: Research container deployment on Dartmouth Dashboard — end-user guide
 resource: https://dashboard.dartmouth.edu
 tags: [dartmouth-dashboard, containers, kubernetes, docker, podman, database, streamlit, end-user, rcd]
 generated: { by: claude-cowork/claude-opus-5-5, at: 2026-10-13T08:45:00-04:00 }
-verified: { by: human:f003q1r, at: 2026-10-13T08:51:49-04:00 }
+verified: { by: human:f003q1r, at: 2026-10-13T10:14:30-04:00 }
 stale_after: 2027-01-13T00:00:00Z
 status: stable
 sources:
@@ -27,6 +27,10 @@ sources:
   - id: dash-github
     resource: https://dashboard.dartmouth.edu/github/invitation_request/
     title: Dashboard — GitHub Invitation Request
+    author: team:dartmouth-rcd
+  - id: dash-templates
+    resource: https://dashboard.dartmouth.edu/compute/
+    title: Dashboard manifest templates (Container Deploy and Kubernetes Deploy sample), provided by RCD
     author: team:dartmouth-rcd
   - id: dash-project
     resource: https://dashboard.dartmouth.edu/project/
@@ -184,15 +188,23 @@ Compute › Container Deploy › **Create**.[^dash-compute]
 | Deployment Name | 3–40 chars: lowercase letters, numbers, dashes; can't start with a number or dash. Also used in the app URL. |
 | Container Image | Image name/tag: the **Location** from Container Images, or a public image such as `ghcr.io/<org>/<image>:<tag>`. |
 | ADD ENVIRONMENT VARIABLE | Non-sensitive settings (names, feature flags). |
-| ADD SECRET | Anything sensitive: `DATABASE_URL`, passwords, API keys. |
-| Ports | Comma-separated TCP ports the app listens on, e.g. `8501` for Streamlit, `8000`, `80,443`. |
+| ADD SECRET | Anything sensitive: `DATABASE_URL`, passwords, API keys. The Dashboard encrypts these and injects them as env vars; nothing else to do. |
+| Ports | Comma-separated TCP ports the app listens on, e.g. `8501` for Streamlit, `8000`, `8080`. Use ports ≥ 1024 (see below). |
 | CPU Limit | Fraction of a CPU, default `0.25`. Billed projects only. |
 | Memory Limit (GB) | Default `1`. Billed projects only. |
+
+CPU and memory are both the guaranteed amount and the hard cap. An app that exceeds its memory limit is killed and restarted.
 
 **App code must:**
 
 - Read config from environment variables (e.g. `os.environ["DATABASE_URL"]`), not hard-coded values or a `.env` file baked into the image.
 - Listen on `0.0.0.0`, not `localhost`/`127.0.0.1`, on the port entered above.
+- **Run as a non-root user.** Containers run as UID/GID `101`, with all Linux capabilities dropped and no privilege escalation.[^dash-templates] So:
+  - Listen on a port **≥ 1024** (e.g. `8080`, not `80`). Stock `nginx`/`httpd` images on port 80 fail; use an unprivileged variant such as `nginxinc/nginx-unprivileged`.
+  - Don't rely on `sudo`, `apt-get` or writing to root-owned paths at runtime. Install everything at build time.
+  - Any directory the app writes to must be writable by UID 101 (e.g. `/tmp`, or `chown 101:101` it in the Dockerfile). Test locally with `podman run --user 101:101 ...`.
+- **Not keep data on the container's disk.** Container Deploy has no persistent volume, so files written inside the container are lost on every restart or update. Use a Dashboard database (or Kubernetes Deploy with a volume).
+- **Expect limited outbound network access.** Each project is its own Kubernetes namespace. The app can reach the public internet, DNS, and anything else in its project, including **that project's Dashboard databases**. Outbound connections to other Dartmouth internal networks are blocked by default, and that includes databases in a *different* project.[^dash-templates] If the app needs a campus service, ask research.computing@dartmouth.edu.
 
 **After clicking Create:** the app is usually up in **5–10 minutes** at:[^rc-workshop]
 
@@ -209,23 +221,38 @@ Include the app name you want, the deployment's `-app.c.dartmouth.edu` address a
 
 **Updating the app:** cut a new GitHub release, wait for a successful build in Container Images, then update the deployment's Container Image to the new Location.
 
+**Change Container Deploys only through the Dashboard.** The Dashboard generates and owns the Kubernetes manifests behind a Container Deploy. Don't edit them by hand. If you need something the form can't do (extra volumes, custom probes, sidecars), use Kubernetes Deploy instead.
+
 **App not loading?**
 
 - Wait the full 10 minutes.
 - The port in the URL must match the Ports field and the port the app listens on.
 - The app must bind to `0.0.0.0`.
+- `Permission denied` errors or a crash on start: usually a port below 1024 or a write to a root-owned path (the container runs as UID 101).
+- Timeouts calling another Dartmouth service, or a database in another project: outbound traffic outside the project to internal networks is blocked by default. Create the database in the same project as the deployment.
 - Missing or misspelled env var/secret names. They are case-sensitive.
 - Database connection: wrong hostname or password, or the database is still provisioning.
-- To see logs and the running state, use Rancher at https://rci-rancher.dartmouth.edu.[^dash-compute]
+- **Logs:** Container Deploy apps **don't have Rancher access**. Reproduce the problem locally with `podman run` (same image, env vars, `--user 101:101`). If it only fails on the cluster, email research.computing@dartmouth.edu with the deployment name. Teams that need regular access to logs should use Kubernetes Deploy.
 
 ## 5. Kubernetes Deploy (advanced)
 
-For users who want to manage Kubernetes manifests themselves. Compute › Kubernetes Deploy › Create.[^dash-compute]
+For users who want to manage Kubernetes manifests themselves.[^dash-compute]
 
-- Creating a deployment sets up a **Git repository of Kubernetes manifests** for it. Sample config files are generated to edit.
+**What you get:** creating a Kubernetes Deploy creates a **GitHub repository of Kubernetes manifests** in the Dartmouth GitHub organization, named `k8s-<deployment-name>`, with **one folder per environment**. The Dashboard links to the repo. **The repo is the deployment.** Edit the manifests, then commit and push. Argo CD syncs the repo to the cluster about **every 5 minutes**, so you never run `kubectl apply` yourself.
+
+**Creating it:** Compute › Kubernetes Deploy › Create.
+
 - **Deployment Name:** 3–40 chars, lowercase, numbers, dashes. **Don't include the environment** (no `-prod`, `-dev`).
-- **Environments** (`+`): each has a **Location** (cluster), an **Environment Name** (stage, e.g. prod/preprod/dev) and a **Path** (manifest directory in the repo). Each Location/Environment combination is an independent deployment.
-- Use Rancher (https://rci-rancher.dartmouth.edu) to monitor state and logs.
+- **Environments** (`+`): each has a **Location** (cluster), an **Environment Name** (stage, e.g. prod/preprod/dev) and a **Path** (that environment's folder in the repo). Each Location/Environment combination is an independent deployment.
+
+**Working with it:**
+
+- **You own these manifests.** Each environment folder starts with a sample (an nginx `Deployment`, a `Service`, a `PersistentVolumeClaim` and a commented-out `SealedSecret`) that you replace with your app.
+- **Secrets must be `SealedSecret`s**, never plain `Secret`s, because the manifests live in Git. Unlike Container Deploy, you seal them yourself with `kubeseal` and the `kubeseal.pem` certificate from Infrastructure Services.
+- How to adapt the sample (image, ports, probes, storage, sealing secrets, mirroring Container Deploy's security settings): [references/kubernetes-manifests.md](references/kubernetes-manifests.md). Load it whenever a user is editing manifests.
+- **Public address:** add the annotation `external-dns.alpha.kubernetes.io/hostname: <name>.c.dartmouth.edu` to your Service to get `http://<name>.c.dartmouth.edu:<port>`. This is the same mechanism Container Deploy uses. For HTTPS, use the load-balancer request in §4.
+- **Sync status, pod state and logs:** use Rancher (https://rci-rancher.dartmouth.edu). It's the only place to see whether Argo CD has applied your last commit. Allow up to 5 minutes after pushing before expecting a change.
+- **Updating the app:** change the image tag in the manifests and push. Unlike Container Deploy, there's no form field to update.
 
 Point beginners to Container Deploy first. Kubernetes Deploy is for people comfortable with manifests.
 
@@ -243,6 +270,7 @@ The Compute console's **Other Resources** panel links to beginner Docker and Kub
 [^gh-create-account]: Get Started on Dartmouth GitHub — Create Account
 [^gh-add-email]: Get Started on Dartmouth GitHub — Add Dartmouth Email
 [^dash-github]: Dashboard — GitHub Invitation Request
+[^dash-templates]: Dashboard manifest templates (Container Deploy and Kubernetes Deploy sample), provided by RCD
 [^dash-project]: Dashboard — Project Console and Create Project form
 [^dash-database]: Dashboard — Database Console and Create Instance form
 [^dash-compute]: Dashboard — Compute Console (builders, images, Container Deploy, Kubernetes Deploy)

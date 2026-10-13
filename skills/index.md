@@ -15,3 +15,4 @@ okf_version: "0.2"
 # research-container-deployment references
 
 * [Todo app walkthrough](research-container-deployment/references/todo-walkthrough.md) - Workshop end-to-end example: Streamlit Todo app + PostgreSQL on Container Deploy.
+* [Kubernetes manifests](research-container-deployment/references/kubernetes-manifests.md) - What Container Deploy generates (Dashboard-managed), the Kubernetes Deploy sample (user-edited), adapting it, sealing secrets with kubeseal.
