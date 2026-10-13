@@ -18,9 +18,9 @@ Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmo
 
 ```bash
 # Any agent (Claude Code, Codex, Cursor, Copilot, …) → ./.agents/skills/ 
-npx skills add <org>/dartmouth-skills --list
-npx skills add <org>/dartmouth-skills@dartmouth-chat
-npx skills add <org>/dartmouth-skills@dartmouth-chat -g   # global: ~/.agents/skills/
+npx skills add dartmouth/dartmouth-skills --list
+npx skills add dartmouth/dartmouth-skills@dartmouth-chat
+npx skills add dartmouth/dartmouth-skills@dartmouth-chat -g   # global: ~/.agents/skills/
 
 # Claude Code plugin marketplace
 /plugin marketplace add <org>/dartmouth-skills
