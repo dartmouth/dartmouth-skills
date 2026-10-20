@@ -1,5 +1,11 @@
 # Skills Update Log
 
+## 2026-10-20
+* **Update**: [decision-models](/decision-models/SKILL.md) and [references/agents-md-template.md](/decision-models/references/agents-md-template.md): added the `decide` FastMCP 4 server (`scripts/decide_mcp.py`, `scripts/test_decide_mcp.py`, and [references/decide-mcp.md](/decision-models/references/decide-mcp.md)) configured for Dartmouth's LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`, default `cloudflare.clef`, API key from `ai.support@dartmouth.edu`, no direct vLLM access), updated LiteLLM System One endpoint guidance to `/v1/systemone` (LiteLLM ≥ v1.105.1), and added packed batching and rerank-filter fallback guidance (status: draft, unverified).
+
+## 2026-10-14
+* **Creation**: Added [decision-models](/decision-models/SKILL.md) and [references/agents-md-template.md](/decision-models/references/agents-md-template.md) for building with decision models served by vLLM through LiteLLM (`/v1/decisions` and `/decisions`) and guiding coding agents on LLM vs decision model selection (status: draft, unverified).
+
 ## 2026-10-13
 * **Verification**: [research-container-deployment](/research-container-deployment/SKILL.md) and [references/kubernetes-manifests.md](/research-container-deployment/references/kubernetes-manifests.md) reviewed by human:f003q1r (status: stable).
 * **Update**: [research-container-deployment](/research-container-deployment/SKILL.md): Kubernetes Deploy creates a `k8s-<name>` repo in the Dartmouth GitHub org, one folder per environment, synced by Argo CD about every 5 min; Rancher access is Kubernetes Deploy only (Container Deploy users go through RCD for logs).
