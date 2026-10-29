@@ -1,12 +1,15 @@
 ---
 type: Reference
 title: decide MCP server — decision models as a coding-agent tool
-description: Install and configure the `decide` FastMCP 4 server so Claude Code, Codex, goose, OpenCode v2 and Cursor can call Clef or Jev on Dartmouth's LiteLLM gateway during a session, one input or many at once.
-tags: [decision-models, clef, jev, mcp, fastmcp, claude-code, codex, goose, opencode, cursor, litellm]
-generated: { by: opencode/gemini-4-argon, at: 2026-10-20T09:55:00-04:00 }
-stale_after: 2027-01-20T00:00:00Z
+description: Install and configure the `decide` FastMCP 4 server so Claude Code, Codex, goose, OpenCode v2 and Cursor can call Clef or Jev on the Dartmouth Chat preprod API during a session, one input or many at once.
+tags: [decision-models, clef, jev, dartmouth-chat, mcp, fastmcp, claude-code, codex, goose, opencode, cursor, litellm]
+generated: { by: claude-code/claude-opus-5-5, at: 2026-10-29T15:52:00-04:00 }
+stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
+  - id: rc-api
+    resource: https://rc.dartmouth.edu/ai/online-resources/using-the-api
+    title: How do I access and use the Dartmouth Chat API?
   - id: fastmcp-4
     resource: https://github.com/PrefectHQ/fastmcp/releases/tag/v4.0.0
     title: FastMCP v4.0.0 release notes
@@ -99,10 +102,10 @@ to about 0.2 seconds. `decide_batch` packs the same way:
 
 | `DECIDE_BACKEND` | Endpoint | Notes |
 | --- | --- | --- |
-| `litellm` (default) | `{DECIDE_BASE_URL}/v1/systemone` | Dartmouth's LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`). Request an API key from **ai.support@dartmouth.edu** (`DECIDE_API_KEY`, `LITELLM_API_KEY`, or `LITELLM_KEY`). LiteLLM ≥ v1.105.1 serves System One payloads on `/v1/systemone` and OpenAI Decisions payloads on `/v1/decisions`.[^litellm-pr-44236] Direct vLLM access is not currently available at this time, so only text/JSON `state` is supported. |
+| `litellm` (default) | `{DECIDE_BASE_URL}/v1/systemone` | The Dartmouth Chat preprod API (`https://chat-preprod.dartmouth.edu/api`), which forwards to Dartmouth's LiteLLM gateway. Use your Dartmouth Chat API key (Profile › Settings › Account › API Key)[^rc-api] in `DECIDE_API_KEY` or `DCHAT_KEY`. It serves System One payloads on `/api/v1/systemone` and OpenAI Decisions payloads on `/api/v1/decisions`.[^litellm-pr-44236] Only text/JSON `state` is supported; images are dropped. |
 | `cloudflare` | Workers AI `ai/run/@cf/cloudflare/{model}` | Needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_AUTH_TOKEN`; the `{success, result}` envelope is unwrapped.[^cf-clef] |
 
-**Diagnostics.** LiteLLM in front of vLLM returns per-question `diagnostics` with
+**Diagnostics.** Clef on vLLM (behind LiteLLM) returns per-question `diagnostics` with
 `label_mass` (how much probability landed on your options before
 renormalising) and `argmax_is_label`. The server flags answers whose
 `argmax_is_label` is false, or whose `label_mass` is below 0.9. A joint-schema
@@ -110,8 +113,8 @@ head scores only your options, so its `label_mass` is always 1.0. If you see
 lower values, the server is scoring next-token label probabilities instead, and
 it's worth checking how the model is served.
 
-**Model aliases.** Use the gateway's model alias (from its `/v1/models`, e.g.
-`cloudflare.clef`; `decision_models` lists the decision models on the endpoint).
+**Model aliases.** Use the model ID from `GET /api/v1/models` (e.g.
+`cloudflare.clef`, `typesafe.jev`; `decision_models` lists the decision models on the endpoint).
 The response's `model` field is the upstream served name (`clef`).
 
 **Retries and audit log.** The server retries 429, 502, 503, 504 and transport
@@ -121,8 +124,8 @@ tool, backend, model, question ids, item count, usage and latency. It never logs
 `state`.
 
 Other settings are `DECIDE_MODEL` (default `cloudflare.clef`),
-`DECIDE_BASE_URL` (default `https://llm-proxy-preprod.dartmouth.edu`),
-`DECIDE_API_KEY` (falls back to `LITELLM_API_KEY`, then `LITELLM_KEY`),
+`DECIDE_BASE_URL` (default `https://chat-preprod.dartmouth.edu/api`),
+`DECIDE_API_KEY` (falls back to `DCHAT_KEY`, then `LITELLM_API_KEY`, then `LITELLM_KEY`),
 `DECIDE_MAX_CHOICE_OPTIONS` (default 26; raise it to 255 for Jev or Workers AI)
 and `DECIDE_TIMEOUT` (default 15 seconds per attempt).
 
@@ -137,10 +140,10 @@ on the handshake era.[^fastmcp-upgrade]
 uv run --script /path/to/decide_mcp.py   # starts on stdio; Ctrl-C to stop
 ```
 
-Request an API key for `https://llm-proxy-preprod.dartmouth.edu` from
-**ai.support@dartmouth.edu**, and keep it in your shell environment
-(`LITELLM_KEY` or `DECIDE_API_KEY`) rather than hard-coding it in agent config
-files.
+Create an API key in Dartmouth Chat preprod (Profile › Settings › Account ›
+API Key) and keep it in your shell environment (`DCHAT_KEY` or
+`DECIDE_API_KEY`) rather than hard-coding it in agent config files. The
+examples below rely on the agent passing your environment through.
 
 **OpenCode v2** (`opencode.json` / `opencode.jsonc`; servers live under `mcp.servers`).[^opencode-v2-mcp]
 `codemode: false` keeps the tools on the model's native tool list, where OpenCode
@@ -156,7 +159,7 @@ names them `decide_decide`, `decide_decide_batch` and so on.
         "codemode": false,
         "environment": {
           "DECIDE_BACKEND": "litellm",
-          "DECIDE_BASE_URL": "https://llm-proxy-preprod.dartmouth.edu",
+          "DECIDE_BASE_URL": "https://chat-preprod.dartmouth.edu/api",
           "DECIDE_MODEL": "cloudflare.clef"
         }
       }
@@ -170,7 +173,7 @@ names them `decide_decide`, `decide_decide_batch` and so on.
 ```bash
 claude mcp add decide \
   -e DECIDE_BACKEND=litellm \
-  -e DECIDE_BASE_URL=https://llm-proxy-preprod.dartmouth.edu \
+  -e DECIDE_BASE_URL=https://chat-preprod.dartmouth.edu/api \
   -e DECIDE_MODEL=cloudflare.clef \
   -- uv run --script /path/to/decide_mcp.py
 ```
@@ -180,7 +183,7 @@ claude mcp add decide \
 ```bash
 codex mcp add decide \
   --env DECIDE_BACKEND=litellm \
-  --env DECIDE_BASE_URL=https://llm-proxy-preprod.dartmouth.edu \
+  --env DECIDE_BASE_URL=https://chat-preprod.dartmouth.edu/api \
   --env DECIDE_MODEL=cloudflare.clef \
   -- uv run --script /path/to/decide_mcp.py
 ```
@@ -199,7 +202,7 @@ extensions:
     description: Decision-model judgments (Clef / Jev)
     envs:
       DECIDE_BACKEND: litellm
-      DECIDE_BASE_URL: https://llm-proxy-preprod.dartmouth.edu
+      DECIDE_BASE_URL: https://chat-preprod.dartmouth.edu/api
       DECIDE_MODEL: cloudflare.clef
 ```
 
@@ -213,7 +216,7 @@ extensions:
       "args": ["run", "--script", "/path/to/decide_mcp.py"],
       "env": {
         "DECIDE_BACKEND": "litellm",
-        "DECIDE_BASE_URL": "https://llm-proxy-preprod.dartmouth.edu",
+        "DECIDE_BASE_URL": "https://chat-preprod.dartmouth.edu/api",
         "DECIDE_MODEL": "cloudflare.clef"
       }
     }
@@ -233,8 +236,9 @@ uv run --with "fastmcp>=4.1,<5" python3 -m unittest skills/decision-models/scrip
 ## Privacy
 
 Every call sends `state` to the configured backend. `cloudflare.clef` on
-`https://llm-proxy-preprod.dartmouth.edu` runs on Dartmouth hardware, so code,
-logs, and project state stay on-premises. Keep the Cloudflare Workers AI backend
+`https://chat-preprod.dartmouth.edu/api` runs on Dartmouth hardware, so code,
+logs, and project state stay on-premises. `typesafe.jev` is a cloud API, so
+state sent to it leaves Dartmouth. Keep the Cloudflare Workers AI backend
 for public or synthetic content.
 
 [^fastmcp-4]: FastMCP v4.0.0 release notes
@@ -243,5 +247,6 @@ for public or synthetic content.
 [^opencode-v2-mcp]: OpenCode v2 — MCP servers
 [^goose-config]: goose — Configuration files
 [^goose-decisions-pr]: goose PR #12418 — decisions provider crate (OpenRouter, Jev)
+[^rc-api]: How do I access and use the Dartmouth Chat API?
 [^litellm-pr-44236]: LiteLLM PR #44236 — Unified /v1/decisions and /decisions endpoint
 [^cf-clef]: Cloudflare Workers AI — clef model page

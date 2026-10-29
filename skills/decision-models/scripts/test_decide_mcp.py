@@ -159,7 +159,7 @@ class Base(unittest.TestCase):
     def setUp(self):
         Mock.log.clear()
         Mock.max_questions = 64
-        self.env = {k: v for k, v in os.environ.items() if not k.startswith(("DECIDE_", "CLOUDFLARE_", "LITELLM_"))}
+        self.env = {k: v for k, v in os.environ.items() if not k.startswith(("DECIDE_", "CLOUDFLARE_", "LITELLM_", "DCHAT_"))}
         self.addCleanup(self._restore_env)
 
     def _restore_env(self):
@@ -264,6 +264,15 @@ class DecideTests(Base):
     def test_litellm_key_fallback(self):
         decide_mcp.run_decision("x", QUESTIONS, cfg=self.cfg(LITELLM_KEY="lk-1"))
         self.assertEqual(Mock.log[-1]["auth"], "Bearer lk-1")
+
+    def test_dchat_key_fallback_wins_over_litellm(self):
+        decide_mcp.run_decision("x", QUESTIONS, cfg=self.cfg(DCHAT_KEY="dk-1", LITELLM_KEY="lk-1"))
+        self.assertEqual(Mock.log[-1]["auth"], "Bearer dk-1")
+
+    def test_default_base_url_is_chat_preprod(self):
+        os.environ.clear()
+        os.environ.update(self.env)
+        self.assertEqual(decide_mcp.config()["base_url"], "https://chat-preprod.dartmouth.edu/api")
 
     def test_prewarm(self):
         self.assertTrue(decide_mcp.prewarm(cfg=self.cfg(DECIDE_BACKEND="systemone")))

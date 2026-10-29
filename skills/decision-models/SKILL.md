@@ -1,15 +1,18 @@
 ---
 name: decision-models
 license: MIT
-description: Build software with Clef and Jev decision models (`cloudflare.clef`, `clef`, `clef-flash`, `jev`) through Dartmouth's LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`, `POST /v1/systemone` or `POST /systemone` for System One payloads; `POST /v1/decisions` for OpenAI Decisions schema). Decision models read `state` and typed `questions` (`noul`, `choice`, `score`) and return a calibrated probability for every allowed option without generating free-form text. Use when a feature needs a fast semantic judgment (routing, triage, tool or handler selection, extraction by selection, verification, moderation, reranking) or when an LLM prompt-and-parse step should become a structured decision. Also ships `decide`, a FastMCP 4 server that lets coding agents (Claude Code, Codex, goose, OpenCode, Cursor) call a decision model as a tool during a session, for one input or packed batches.
+description: Build software with Clef and Jev decision models (`cloudflare.clef`, `typesafe.jev`) through the Dartmouth Chat preprod API (`POST https://chat-preprod.dartmouth.edu/api/v1/systemone` for System One payloads; `POST /api/v1/decisions` for the OpenAI Decisions schema). Decision models read `state` and typed `questions` (`noul`, `choice`, `score`) and return a calibrated probability for every allowed option without generating free-form text. Use when a feature needs a fast semantic judgment (routing, triage, tool or handler selection, extraction by selection, verification, moderation, reranking) or when an LLM prompt-and-parse step should become a structured decision. Also ships `decide`, a FastMCP 4 server that lets coding agents (Claude Code, Codex, goose, OpenCode, Cursor) call a decision model as a tool during a session, for one input or packed batches.
 type: Agent Skill
 title: Build with Clef and Jev decision models
 resource: https://huggingface.co/Cloudflare/clef
-tags: [decision-models, clef, jev, litellm, vllm, system-one, classification, routing, mcp, fastmcp]
-generated: { by: opencode/gemini-4-argon, at: 2026-10-20T09:55:00-04:00 }
-stale_after: 2027-01-20T00:00:00Z
+tags: [decision-models, clef, jev, dartmouth-chat, litellm, vllm, system-one, classification, routing, mcp, fastmcp]
+generated: { by: claude-code/claude-opus-5-5, at: 2026-10-29T15:52:00-04:00 }
+stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
+  - id: rc-api
+    resource: https://rc.dartmouth.edu/ai/online-resources/using-the-api
+    title: How do I access and use the Dartmouth Chat API?
   - id: litellm-pr-44236
     resource: https://github.com/BerriAI/litellm/pull/44236
     title: LiteLLM PR #44236 — Unified /v1/decisions and /decisions endpoint
@@ -48,7 +51,7 @@ decision model vs an LLM vs plain code, see
 ## Call from a coding agent: the `decide` MCP
 
 [`scripts/decide_mcp.py`](scripts/decide_mcp.py) is a single-file FastMCP 4
-stdio server[^fastmcp-tools] that talks to the LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`).
+stdio server[^fastmcp-tools] that talks to the Dartmouth Chat preprod API (`https://chat-preprod.dartmouth.edu/api`).
 It exposes `decide` for one input, `decide_batch` for the same questions over
 many items or to rerank candidates, and `decision_models`, plus a
 `decide://guide` resource and a `design_questions` prompt. It validates questions
@@ -92,38 +95,41 @@ concept and cookbook applies to both Jev and Clef:
 - Inspect the closest cookbook (`function_calling.md`, `pre_parsed_value_extraction_cookbook.md`,
   `rerank_typesafe.md`, `hierarchical_classification.md`, `citation_check.md`, `sde_cascade.md`)
   for decomposition patterns.
-- **Always call through the LiteLLM gateway endpoints below** rather than calling
+- **Always call through the Dartmouth Chat API endpoints below** rather than calling
   `api.typesafe.ai` directly.
 
 ## Endpoints and access
 
-- **Gateway URL:** `https://llm-proxy-preprod.dartmouth.edu`
-- **API Key:** Request an API key from **ai.support@dartmouth.edu**.
-- **No direct vLLM access:** Direct access to the underlying vLLM server is not currently available at this time. All requests must go through the LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`), which means only **text and JSON `state`** are currently available (LiteLLM's native route does not pass `images` or `videos` through).
+- **Base URL:** `https://chat-preprod.dartmouth.edu/api` (Dartmouth Chat preprod, which forwards decision requests to Dartmouth's LiteLLM gateway). Paths below are relative to the host.
+- **API key:** your personal Dartmouth Chat key: chat-preprod.dartmouth.edu › Profile › Settings › Account › API Key.[^rc-api] It shares your account's credit budget (`GET /api/v1/credits/balance`). Keep it in `DCHAT_KEY` and send it as `Authorization: Bearer $DCHAT_KEY`.
+- **Text and JSON `state` only.** Images sent in `images` are silently dropped (the model answers as if none were attached), and there is no direct vLLM access.
 
-| Use case | Endpoint / SDK |
+| Use case | Endpoint |
 | --- | --- |
-| **Text & JSON state (Clef or Jev)** | **LiteLLM Proxy (`https://llm-proxy-preprod.dartmouth.edu`):** `POST /v1/systemone` (or `POST /systemone` for System One `state` + `questions` dict)<br>JS SDK: TypeSafe JS SDK (`systemOne()`) pointed at the proxy[^litellm-pr-44236][^typesafe-docs] |
+| System One schema (`state` + `questions` object), Clef or Jev | `POST /api/v1/systemone`[^litellm-pr-44236][^typesafe-docs] |
+| OpenAI Decisions schema (`input` + `questions` array) | `POST /api/v1/decisions`[^litellm-pr-44236] |
+| List models | `GET /api/v1/models` (decision models have `"mode": "evaluation"`) |
 
-> Why `/v1/systemone`? In LiteLLM ≥ v1.105.1, `POST /v1/systemone` (and `/systemone`) takes the System One schema (`model`, `state`, and `questions` object) for both Clef and Jev while handling gateway keys, budgets, and `metadata.tags` (`POST /v1/decisions` uses the OpenAI Decisions schema: `input` + `questions` array).[^litellm-pr-44236] Gateway responses can add `id`, `object` and per-question `diagnostics` (`label_mass`, `argmax_is_label`): treat `argmax_is_label: false`, or a `label_mass` well below 1, as an unreliable answer. Request the gateway's model alias (e.g. `cloudflare.clef`); the response's `model` is the served name (`clef`).
+> Use `/api/v1/...`. `/api/systemone` returns 405, and `/api/chat/completions` rejects decision models. A `GET` to an unknown path returns the web app's HTML with status 200, so check for a JSON body. Responses can add `id`, `object` and per-question `diagnostics` (`label_mass`, `argmax_is_label`): treat `argmax_is_label: false`, or a `label_mass` well below 1, as an unreliable answer. Request the model ID (e.g. `cloudflare.clef`); the response's `model` is the served name (`clef`, `jev-1.14.0`).
+
+**OpenAI Decisions format** (`/api/v1/decisions`): `questions` is a list; each item has `name`, `type` (`predicate` for yes/no, `choice`, `score`) and `instructions`. Choice options are `choices: [{"value": "billing", "description": "..."}]`, and score levels are `levels: [{"label": "No impact"}, ...]`, lowest first. `answers` comes back as a list: `{"type": "predicate", "name": ..., "probability": 0.98}`, and `choice`/`score` answers carry `probabilities` as a list of `{value, probability}`. Prefer `/api/v1/systemone` unless your client already speaks OpenAI Decisions.
 
 ## Pick the model: Clef vs Jev
 
-Check `GET /v1/models` on `https://llm-proxy-preprod.dartmouth.edu` for the exact deployed model names (such as `cloudflare.clef`, `cloudflare.clef-flash`, or `jev`).
+Check `GET https://chat-preprod.dartmouth.edu/api/v1/models` for the deployed IDs. As of 2026-10-29 preprod serves `cloudflare.clef` and `typesafe.jev`; `clef-flash` is not deployed there.
 
 | Model | Origin & Hosting | Modalities & Limits | Best for |
 | --- | --- | --- | --- |
-| **`cloudflare.clef`** (`clef`) | **Cloudflare** open-weight (Apache 2.0, Qwen3.8-27B + joint schema head), **hosted on Dartmouth vLLM via LiteLLM**[^hf-clef][^vllm-decisions-doc] | Text & JSON via gateway (`16,384` ctx; `choice` `2..26` options) | **Default on Dartmouth's gateway.** Fast, private classification, routing, triage, tool selection (BANKING77, BFCL), and scoring. |
-| **`cloudflare.clef-flash`** (`clef-flash`) | **Cloudflare** open-weight (Apache 2.0, Qwen3.5-9B + joint schema head), **hosted on vLLM via LiteLLM**[^hf-clef][^vllm-decisions-doc] | Text & JSON via gateway (`16,384` ctx; `choice` `2..26` options) | Smaller 9B variant for high-throughput paths when deployed alongside `clef`. |
-| **`jev`** | **TypeSafe** proprietary System One flagship model, **cloud-hosted API** (routed via LiteLLM)[^typesafe-docs][^litellm-pr-44236] | **Text & JSON only** (`choice` `2..255` options) | Leads on reasoning-heavy decision sets (GPQA, MMLU-Pro, BBH, When2Call). Returns `{"type": "noul", "noul": 0.97}` on `noul` (without the extra `probabilities`/`confidence` fields vLLM adds on `noul`). |
+| **`cloudflare.clef`** (`clef`) | **Cloudflare** open-weight (Apache 2.0, Qwen3.8-27B + joint schema head), **hosted on Dartmouth vLLM**[^hf-clef][^vllm-decisions-doc] | Text & JSON (`16,384` ctx; `choice` `2..26` options) | **Default.** Fast, private classification, routing, triage, tool selection (BANKING77, BFCL), and scoring. |
+| **`typesafe.jev`** (`jev-1.14.0`) | **TypeSafe** proprietary System One flagship model, **cloud-hosted API**[^typesafe-docs] | **Text & JSON only** (`choice` `2..255` options) | Leads on reasoning-heavy decision sets (GPQA, MMLU-Pro, BBH, When2Call). Returns `{"type": "noul", "noul": 0.95}` on `noul` (without the extra `probabilities`/`confidence` fields vLLM adds). |
 
-Because TypeSafe created the System One API for **Jev** and Cloudflare built **Clef** to speak that exact same schema, switching or A/B testing between `cloudflare.clef`, `cloudflare.clef-flash`, and `jev` on LiteLLM's `/v1/systemone` is just changing `"model"` in config.
+Because TypeSafe created the System One API for **Jev** and Cloudflare built **Clef** to speak that exact same schema, switching or A/B testing between `cloudflare.clef` and `typesafe.jev` on `/api/v1/systemone` is just changing `"model"`.
 
 ## Request contract
 
 Send only `model`, `state`, and `questions`.[^litellm-pr-44236][^vllm-decisions-doc] Never add LLM chat fields (`messages`, `temperature`, `max_tokens`, `system`, `stream`, or top-level `instructions`).
 
-- **`model`** (string): deployed gateway model name (e.g. `cloudflare.clef`).
+- **`model`** (string): deployed model ID (e.g. `cloudflare.clef`).
 - **`state`** (required, string, JSON object, or JSON array): what the questions are about.
   - Context limit is **16,384 tokens**.[^vllm-decisions-doc] Questions are counted first; if they don't fit, the request fails with `400`. Otherwise, long `state` is **silently truncated** to fit. Chunk or pre-select long text in code.
 - **`questions`** (required, object): `1..64` questions mapping `<question_id>` -> question definition.[^vllm-decisions-doc] Question IDs must be non-empty strings without `:` or newlines.
@@ -134,11 +140,11 @@ Send only `model`, `state`, and `questions`.[^litellm-pr-44236][^vllm-decisions-
   - **`score`** (ordered scale): `instructions` (string) and `criteria` as an ordered array of **`2..10` level descriptions**, lowest first (indexed from `0`).[^vllm-decisions-doc]
     - Returns `{"type": "score", "score": 1.96, "legend": {"0": "...", ...}, "probabilities": {"0": 0.01, ...}, "confidence": 0.96}`. `score` is the probability-weighted expected index (can be fractional).
 
-### Example: HTTP `POST /v1/systemone`
+### Example: HTTP `POST /api/v1/systemone`
 
 ```bash
-curl -sS "https://llm-proxy-preprod.dartmouth.edu/v1/systemone" \
-  -H "Authorization: Bearer $LITELLM_KEY" \
+curl -sS "https://chat-preprod.dartmouth.edu/api/v1/systemone" \
+  -H "Authorization: Bearer $DCHAT_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "cloudflare.clef",
@@ -279,6 +285,7 @@ parts.
 - **For failures, inspect exact state (was it truncated at 16K?), questions,
   candidates, answers, and composition before blaming the model.**
 
+[^rc-api]: How do I access and use the Dartmouth Chat API?
 [^litellm-pr-44236]: LiteLLM PR #44236 — Unified /v1/decisions and /decisions endpoint
 [^vllm-decisions-doc]: vLLM — Structured Decisions Models (/v1/systemone)
 [^hf-clef]: Cloudflare/clef model card and weights (Apache 2.0)

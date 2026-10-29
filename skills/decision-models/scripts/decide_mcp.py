@@ -15,17 +15,18 @@ Prompt:   design_questions  (OpenCode shows it as /decide:design_questions)
 Resource: decide://guide    (question-writing rules)
 
 Backends (DECIDE_BACKEND):
-  litellm     POST {DECIDE_BASE_URL}/v1/systemone   (default; LiteLLM gateway, text/JSON state)
+  litellm     POST {DECIDE_BASE_URL}/v1/systemone   (default; Dartmouth Chat API / LiteLLM, text/JSON state)
   systemone   POST {DECIDE_BASE_URL}/v1/systemone   (direct vLLM /v1/systemone endpoint; images OK)
   cloudflare  POST https://api.cloudflare.com/client/v4/accounts/{id}/ai/run/@cf/cloudflare/{model}
 
 Environment:
   DECIDE_BACKEND            litellm | systemone | cloudflare   (default litellm)
-  DECIDE_BASE_URL           gateway / server base URL          (default https://llm-proxy-preprod.dartmouth.edu)
-  DECIDE_API_KEY            bearer token from ai.support@dartmouth.edu (falls back to LITELLM_API_KEY, then LITELLM_KEY)
+  DECIDE_BASE_URL           gateway / server base URL          (default https://chat-preprod.dartmouth.edu/api)
+  DECIDE_API_KEY            Dartmouth Chat API key (Settings > Account > API Key); falls back to
+                            DCHAT_KEY, then LITELLM_API_KEY, then LITELLM_KEY
   DECIDE_MODEL              default model                      (default cloudflare.clef)
   DECIDE_ROUTES             JSON: per-model endpoints, e.g.
-                            {"<model>": {"backend": "litellm", "base_url": "...", "api_key_env": "LITELLM_KEY"}}
+                            {"<model>": {"backend": "litellm", "base_url": "...", "api_key_env": "DCHAT_KEY"}}
                             A routed model uses its route's settings; unrouted models use the DECIDE_* defaults.
   DECIDE_ESCALATE_MODEL     opt-in cascade: answers flagged unsure on the default model are re-asked
                             once on this model
@@ -87,12 +88,17 @@ class DecideError(Exception):
 # --------------------------------------------------------------------------- config
 
 
+def fallback_key() -> str | None:
+    env = os.environ
+    return env.get("DCHAT_KEY") or env.get("LITELLM_API_KEY") or env.get("LITELLM_KEY")
+
+
 def config() -> dict[str, Any]:
     env = os.environ
     return {
         "backend": env.get("DECIDE_BACKEND", "litellm").strip().lower(),
-        "base_url": env.get("DECIDE_BASE_URL", "https://llm-proxy-preprod.dartmouth.edu").rstrip("/"),
-        "api_key": env.get("DECIDE_API_KEY") or env.get("LITELLM_API_KEY") or env.get("LITELLM_KEY"),
+        "base_url": env.get("DECIDE_BASE_URL", "https://chat-preprod.dartmouth.edu/api").rstrip("/"),
+        "api_key": env.get("DECIDE_API_KEY") or fallback_key(),
         "model": env.get("DECIDE_MODEL", "cloudflare.clef"),
         "routes_raw": env.get("DECIDE_ROUTES") or "",
         "escalate_model": env.get("DECIDE_ESCALATE_MODEL") or None,
@@ -135,7 +141,7 @@ def route_cfg(cfg: dict[str, Any], model: str) -> dict[str, Any]:
     if not route.get("base_url") and route.get("backend", "systemone") != "cloudflare":
         raise DecideError(f"DECIDE_ROUTES[{model!r}] needs a base_url.")
     key_env = route.get("api_key_env")
-    api_key = (os.environ.get(key_env) or os.environ.get("LITELLM_API_KEY") or os.environ.get("LITELLM_KEY")) if key_env else None
+    api_key = (os.environ.get(key_env) or fallback_key()) if key_env else None
     return {
         **cfg,
         "backend": route.get("backend", "systemone").strip().lower(),
@@ -681,7 +687,7 @@ mcp = FastMCP(
 def decide(
     state: Annotated[Any, Field(description="Text or JSON the questions are about. Prefer named JSON fields when there are several parts.")],
     questions: Annotated[dict[str, dict[str, Any]], Field(description="Map of question id -> {type, instructions, criteria}. 1..64 questions.")],
-    model: Annotated[str | None, Field(description="Override the default model (e.g. cloudflare.clef, clef, clef-flash, jev).")] = None,
+    model: Annotated[str | None, Field(description="Override the default model (e.g. cloudflare.clef, typesafe.jev, clef, clef-flash).")] = None,
     image_paths: Annotated[list[str | None], Field(description="Optional local PNG/JPEG/WebP paths (max 4, <=4 MiB each). Clef only.")] | None = None,
     escalate: Annotated[bool, Field(description="If the server has an escalation model configured, re-ask unsure answers on it once. Set false to compare models.")] = True,
 ) -> dict[str, Any]:

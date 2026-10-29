@@ -2,9 +2,9 @@
 type: Reference
 title: AGENTS.md template — LLM vs decision model guidance
 description: Drop-in AGENTS.md rules for projects that combine LLMs with Clef and Jev decision models.
-tags: [decision-models, clef, jev, litellm, vllm, system-one, agents-md, llm, routing, classification]
-generated: { by: opencode/gemini-4-argon, at: 2026-10-20T09:55:00-04:00 }
-stale_after: 2027-01-20T00:00:00Z
+tags: [decision-models, clef, jev, dartmouth-chat, litellm, vllm, system-one, agents-md, llm, routing, classification]
+generated: { by: claude-code/claude-opus-5-5, at: 2026-10-29T15:52:00-04:00 }
+stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
   - id: litellm-pr-44236
@@ -65,8 +65,8 @@ Don't call `decide` for single-item choices you already have in context (such as
 ## Writing application code that calls decision models
 
 - Use the `decision-models` skill.
-- Call `POST /v1/systemone` (or `/systemone`) on the LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`) for text/JSON System One state (`POST /v1/decisions` uses the OpenAI Decisions schema). Request an API key from **ai.support@dartmouth.edu**. Direct vLLM access is not currently available at this time, so only text/JSON `state` is supported.[^litellm-pr-44236][^vllm-decisions-doc]
-- Default `cloudflare.clef`; use `jev` only where labeled examples show Clef failing on reasoning-heavy decisions.
+- Call `POST https://chat-preprod.dartmouth.edu/api/v1/systemone` for text/JSON System One state (`POST /api/v1/decisions` uses the OpenAI Decisions schema). Authenticate with a Dartmouth Chat API key (`DCHAT_KEY`), kept server-side. Only text/JSON `state` is supported; images are dropped.[^litellm-pr-44236][^vllm-decisions-doc]
+- Default `cloudflare.clef`; use `typesafe.jev` only where labeled examples show Clef failing on reasoning-heavy decisions.
 - Request has only `model`, `state`, `questions` (`1..64` questions, `choice` `2..26` options, `score` `2..10` levels). No other fields.[^vllm-decisions-doc]
 - All independent questions about one state go in one request.
 - Full meaning in `instructions`; question IDs aren't used by the model to understand the question.

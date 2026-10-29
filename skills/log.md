@@ -1,5 +1,8 @@
 # Skills Update Log
 
+## 2026-10-29
+* **Update**: [decision-models](/decision-models/SKILL.md), [references/decide-mcp.md](/decision-models/references/decide-mcp.md) and [references/agents-md-template.md](/decision-models/references/agents-md-template.md): switched from the LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`) to the Dartmouth Chat preprod API (`https://chat-preprod.dartmouth.edu/api`, `POST /api/v1/systemone` and `/api/v1/decisions`, personal Dartmouth Chat API key). Model IDs are now `cloudflare.clef` and `typesafe.jev` (no `clef-flash` on preprod). Documented the OpenAI Decisions request format and that images are dropped. `decide_mcp.py` now defaults to the new base URL and also reads `DCHAT_KEY`, with tests added. Tested live against preprod on 2026-10-29 (status: draft, unverified).
+
 ## 2026-10-20
 * **Update**: [decision-models](/decision-models/SKILL.md) and [references/agents-md-template.md](/decision-models/references/agents-md-template.md): added the `decide` FastMCP 4 server (`scripts/decide_mcp.py`, `scripts/test_decide_mcp.py`, and [references/decide-mcp.md](/decision-models/references/decide-mcp.md)) configured for Dartmouth's LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`, default `cloudflare.clef`, API key from `ai.support@dartmouth.edu`, no direct vLLM access), updated LiteLLM System One endpoint guidance to `/v1/systemone` (LiteLLM ≥ v1.105.1), and added packed batching and rerank-filter fallback guidance (status: draft, unverified).
 
