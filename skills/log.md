@@ -1,5 +1,8 @@
 # Skills Update Log
 
+## 2026-11-05
+* **Creation**: Added [langchain-dartmouth](/langchain-dartmouth/SKILL.md), built from the library source (`../langchain-dartmouth/src/langchain_dartmouth`) and cookbook notebooks (`../langchain-dartmouth-cookbook`): authentication keys, choosing model classes, basic usage quirks, chains/RAG notebook map, and `DartmouthDecisions` usage (status: draft, unverified).
+
 ## 2026-10-29
 * **Update**: [decision-models](/decision-models/SKILL.md), [references/decide-mcp.md](/decision-models/references/decide-mcp.md) and [references/agents-md-template.md](/decision-models/references/agents-md-template.md): switched from the LiteLLM gateway (`https://llm-proxy-preprod.dartmouth.edu`) to the Dartmouth Chat preprod API (`https://chat-preprod.dartmouth.edu/api`, `POST /api/v1/systemone` and `/api/v1/decisions`, personal Dartmouth Chat API key). Model IDs are now `cloudflare.clef` and `typesafe.jev` (no `clef-flash` on preprod). Documented the OpenAI Decisions request format and that images are dropped. `decide_mcp.py` now defaults to the new base URL and also reads `DCHAT_KEY`, with tests added. Tested live against preprod on 2026-10-29 (status: draft, unverified).
 
