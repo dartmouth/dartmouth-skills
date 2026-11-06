@@ -3,7 +3,7 @@ type: Reference
 title: decide MCP server — decision models as a coding-agent tool
 description: Install and configure the `decide` FastMCP 4 server so Claude Code, Codex, goose, OpenCode v2 and Cursor can call Clef or Jev on the Dartmouth Chat API during a session, one input or many at once.
 tags: [decision-models, clef, jev, dartmouth-chat, mcp, fastmcp, claude-code, codex, goose, opencode, cursor, litellm]
-generated: { by: opencode/mistral-large-4, at: 2026-11-06T12:58:00-05:00 }
+generated: { by: opencode/mistral-large-4, at: 2026-11-06T13:05:00-05:00 }
 stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
@@ -147,6 +147,8 @@ API Key) and keep it in your shell environment (`DCHAT_KEY` or
 examples below rely on the agent passing your environment through.
 
 **OpenCode v2** (`opencode.json` / `opencode.jsonc`; servers live under `mcp.servers`).[^opencode-v2-mcp]
+Put the file in the project directory, or at `~/.config/opencode/opencode.json` for
+every project (equivalently `opencode mcp add decide --global -- uv run --script ...`).
 `codemode: false` keeps the tools on the model's native tool list, where OpenCode
 names them `decide_decide`, `decide_decide_batch` and so on.
 
