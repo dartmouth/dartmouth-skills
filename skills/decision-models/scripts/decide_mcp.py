@@ -531,7 +531,7 @@ def run_batch(
 DECISION_MODEL_HINT = re.compile(r"clef|jev|decision|system.?one", re.I)
 
 
-def _endpoint_models(rcfg: dict[str, Any]) -> list[str]:
+def _endpoint_models(rcfg: dict[str, Any], requested: str | None = None) -> list[str]:
     if rcfg["backend"] == "cloudflare":
         return ["clef-flash", "clef"]
     headers = {"Accept": "application/json"}
@@ -549,20 +549,26 @@ def _endpoint_models(rcfg: dict[str, Any]) -> list[str]:
     ids = [m.get("id") for m in data.get("data", []) if isinstance(m, dict) and m.get("id")]
     # Gateways list every LLM they serve; keep the decision models so the answer stays short.
     hinted = [i for i in ids if DECISION_MODEL_HINT.search(i)]
-    return hinted or ids
+    listed = hinted or ids
+    # A gateway may serve a model under a different name (e.g. route id cloudflare.clef
+    # served as "clef") and omit the route id from /v1/models entirely. Always include the
+    # model this endpoint is configured for so it stays callable.
+    if requested and requested not in listed:
+        listed = [requested, *listed]
+    return listed
 
 
 def list_models(cfg: dict[str, Any] | None = None) -> dict[str, Any]:
     cfg = cfg or config()
-    targets = {"(default endpoint)": cfg}
+    targets: dict[str, tuple[dict[str, Any], str | None]] = {"(default endpoint)": (cfg, cfg["model"])}
     for name in routes(cfg):
-        targets[name] = route_cfg(cfg, name)
+        targets[name] = (route_cfg(cfg, name), name)
     endpoints = []
-    for label, rcfg in targets.items():
+    for label, (rcfg, requested) in targets.items():
         entry: dict[str, Any] = {"for": label, "backend": rcfg["backend"],
                                  "url": "cloudflare" if rcfg["backend"] == "cloudflare" else rcfg["base_url"]}
         try:
-            entry["models"] = _endpoint_models(rcfg)
+            entry["models"] = _endpoint_models(rcfg, requested)
         except DecideError as e:
             entry["error"] = str(e)
         endpoints.append(entry)

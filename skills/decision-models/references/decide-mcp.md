@@ -3,7 +3,7 @@ type: Reference
 title: decide MCP server — decision models as a coding-agent tool
 description: Install and configure the `decide` FastMCP 4 server so Claude Code, Codex, goose, OpenCode v2 and Cursor can call Clef or Jev on the Dartmouth Chat API during a session, one input or many at once.
 tags: [decision-models, clef, jev, dartmouth-chat, mcp, fastmcp, claude-code, codex, goose, opencode, cursor, litellm]
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-29T15:52:00-04:00 }
+generated: { by: opencode/mistral-large-4, at: 2026-11-06T12:58:00-05:00 }
 stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
@@ -58,7 +58,7 @@ calls `decide` / `decide_batch` when a decision model actually beats an LLM turn
 | --- | --- |
 | tool `decide(state, questions, model?, image_paths?)` | One System One request about one input. Returns `{model, answers, usage, latency_ms, warnings}`. |
 | tool `decide_batch(items, questions, model?, rank_by?, min_value?, top_k?)` | Asks the same questions of many items, packed up to 64 questions per request. Returns `results` keyed by your ids, plus an optional `ranking`. |
-| tool `decision_models()` | Lists the decision models on each configured endpoint (`GET /v1/models`, filtered to Clef/Jev-looking ids), plus the default and escalation model. |
+| tool `decision_models()` | Lists the decision models on each configured endpoint (`GET /v1/models`, filtered to Clef/Jev-looking ids), plus the default and escalation model. The model each endpoint is configured for (default or `DECIDE_ROUTES` key) is always listed first, even when the gateway serves it under a different name and omits it from `/v1/models`. |
 | resource `decide://guide` | Question-writing rules, readable by agents that load resources. |
 | prompt `design_questions(task)` | Walks the agent through drafting, showing and running questions. OpenCode lists it as `/decide:design_questions`. |
 
@@ -114,7 +114,8 @@ lower values, the server is scoring next-token label probabilities instead, and
 it's worth checking how the model is served.
 
 **Model aliases.** Use the model ID from `GET /api/v1/models` (e.g.
-`cloudflare.clef`, `typesafe.jev`; `decision_models` lists the decision models on the endpoint).
+`cloudflare.clef`, `typesafe.jev`; `decision_models` lists the decision models on the endpoint,
+always including the configured model even if the gateway omits it from `/v1/models`).
 The response's `model` field is the upstream served name (`clef`).
 
 **Retries and audit log.** The server retries 429, 502, 503, 504 and transport

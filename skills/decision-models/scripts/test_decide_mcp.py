@@ -101,6 +101,10 @@ class Mock(BaseHTTPRequestHandler):
             return self._send(200, {"data": [{"id": "cloudflare.clef"}, {"id": "clef-flash"}, {"id": "clef"}, {"id": "jev"}]})
         if self.path == "/gw/v1/models":  # a gateway lists every LLM it serves
             return self._send(200, {"data": [{"id": "gpt-6-luna"}, {"id": "cloudflare.clef"}, {"id": "glm-5.3"}]})
+        if self.path == "/alias/v1/models":  # serves the decision model under a bare name only
+            return self._send(200, {"data": [{"id": "clef"}, {"id": "gpt-6-luna"}]})
+        if self.path == "/plain/v1/models":  # no decision-looking ids at all
+            return self._send(200, {"data": [{"id": "gpt-6-luna"}, {"id": "glm-5.3"}]})
         self._send(404, {"error": "nope"})
 
     def do_POST(self):
@@ -397,6 +401,19 @@ class GatewayTests(Base):
         by = {e["for"]: e for e in out["endpoints"]}
         self.assertEqual(by["cloudflare.clef"]["models"], ["cloudflare.clef"])
         self.assertEqual(by["(default endpoint)"]["models"], ["cloudflare.clef", "clef-flash", "clef", "jev"])
+
+    def test_list_models_keeps_configured_model_when_gateway_omits_it(self):
+        # The route id (cloudflare.clef) is not in /v1/models, which serves it as "clef".
+        routes = {"cloudflare.clef": {"backend": "systemone", "base_url": f"{self.base}/alias"}}
+        out = decide_mcp.list_models(cfg=self.cfg(DECIDE_ROUTES=json.dumps(routes), DECIDE_MODEL="clef-flash"))
+        by = {e["for"]: e for e in out["endpoints"]}
+        self.assertEqual(by["cloudflare.clef"]["models"], ["cloudflare.clef", "clef"])
+        # The default endpoint's configured model is always listed first, even if unlisted.
+        routes2 = {"cloudflare.clef": {"backend": "systemone", "base_url": f"{self.base}/plain"}}
+        out2 = decide_mcp.list_models(cfg=self.cfg(DECIDE_BASE_URL=f"{self.base}/plain", DECIDE_ROUTES=json.dumps(routes2)))
+        by2 = {e["for"]: e for e in out2["endpoints"]}
+        self.assertEqual(by2["(default endpoint)"]["models"][0], "cloudflare.clef")
+        self.assertIn("gpt-6-luna", by2["(default endpoint)"]["models"])  # no hint matches: full list
 
     def test_bad_routes_json(self):
         with self.assertRaisesRegex(decide_mcp.DecideError, "DECIDE_ROUTES"):
