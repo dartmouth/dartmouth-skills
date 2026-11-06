@@ -1,7 +1,7 @@
 ---
 name: decision-models
 license: MIT
-description: Build software with Clef and Jev decision models (`cloudflare.clef`, `typesafe.jev`) through the Dartmouth Chat preprod API (`POST https://chat-preprod.dartmouth.edu/api/v1/systemone` for System One payloads; `POST /api/v1/decisions` for the OpenAI Decisions schema). Decision models read `state` and typed `questions` (`noul`, `choice`, `score`) and return a calibrated probability for every allowed option without generating free-form text. Use when a feature needs a fast semantic judgment (routing, triage, tool or handler selection, extraction by selection, verification, moderation, reranking) or when an LLM prompt-and-parse step should become a structured decision. Also ships `decide`, a FastMCP 4 server that lets coding agents (Claude Code, Codex, goose, OpenCode, Cursor) call a decision model as a tool during a session, for one input or packed batches.
+description: Build software with Clef and Jev decision models (`cloudflare.clef`, `typesafe.jev`) through the Dartmouth Chat API (`POST https://chat.dartmouth.edu/api/v1/systemone` for System One payloads; `POST /api/v1/decisions` for the OpenAI Decisions schema). Decision models read `state` and typed `questions` (`noul`, `choice`, `score`) and return a calibrated probability for every allowed option without generating free-form text. Use when a feature needs a fast semantic judgment (routing, triage, tool or handler selection, extraction by selection, verification, moderation, reranking) or when an LLM prompt-and-parse step should become a structured decision. Also ships `decide`, a FastMCP 4 server that lets coding agents (Claude Code, Codex, goose, OpenCode, Cursor) call a decision model as a tool during a session, for one input or packed batches.
 type: Agent Skill
 title: Build with Clef and Jev decision models
 resource: https://huggingface.co/Cloudflare/clef
@@ -44,6 +44,9 @@ define and there is no JSON to repair.[^typesafe-skill]
 Code owns the workflow; the decision model supplies judgment where code needs understanding.
 A coding agent keeps its own LLM. Clef or Jev is called either by the code the
 agent writes, or by the agent itself through the `decide` MCP tool (below).
+In Python, call the API through `DartmouthDecisions` from the `langchain_dartmouth`
+package rather than hand-rolling HTTP — see the
+[langchain-dartmouth skill](../langchain-dartmouth/SKILL.md).
 For a drop-in `AGENTS.md` template guiding coding agents on when to pick a
 decision model vs an LLM vs plain code, see
 [references/agents-md-template.md](references/agents-md-template.md).
@@ -51,7 +54,7 @@ decision model vs an LLM vs plain code, see
 ## Call from a coding agent: the `decide` MCP
 
 [`scripts/decide_mcp.py`](scripts/decide_mcp.py) is a single-file FastMCP 4
-stdio server[^fastmcp-tools] that talks to the Dartmouth Chat preprod API (`https://chat-preprod.dartmouth.edu/api`).
+stdio server[^fastmcp-tools] that talks to the Dartmouth Chat API (`https://chat.dartmouth.edu/api`).
 It exposes `decide` for one input, `decide_batch` for the same questions over
 many items or to rerank candidates, and `decision_models`, plus a
 `decide://guide` resource and a `design_questions` prompt. It validates questions
@@ -100,8 +103,8 @@ concept and cookbook applies to both Jev and Clef:
 
 ## Endpoints and access
 
-- **Base URL:** `https://chat-preprod.dartmouth.edu/api` (Dartmouth Chat preprod, which forwards decision requests to Dartmouth's LiteLLM gateway). Paths below are relative to the host.
-- **API key:** your personal Dartmouth Chat key: chat-preprod.dartmouth.edu › Profile › Settings › Account › API Key.[^rc-api] It shares your account's credit budget (`GET /api/v1/credits/balance`). Keep it in `DCHAT_KEY` and send it as `Authorization: Bearer $DCHAT_KEY`.
+- **Base URL:** `https://chat.dartmouth.edu/api` (Dartmouth Chat, which forwards decision requests to Dartmouth's LiteLLM gateway). Paths below are relative to the host.
+- **API key:** your personal Dartmouth Chat key: chat.dartmouth.edu › Profile › Settings › Account › API Key.[^rc-api] It shares your account's credit budget (`GET /api/v1/credits/balance`). Keep it in `DCHAT_KEY` and send it as `Authorization: Bearer $DCHAT_KEY`.
 - **Text and JSON `state` only.** Images sent in `images` are silently dropped (the model answers as if none were attached), and there is no direct vLLM access.
 
 | Use case | Endpoint |
@@ -116,7 +119,7 @@ concept and cookbook applies to both Jev and Clef:
 
 ## Pick the model: Clef vs Jev
 
-Check `GET https://chat-preprod.dartmouth.edu/api/v1/models` for the deployed IDs. As of 2026-10-29 preprod serves `cloudflare.clef` and `typesafe.jev`; `clef-flash` is not deployed there.
+Check `GET https://chat.dartmouth.edu/api/v1/models` for the deployed IDs. As of 2026-10-29 the API serves `cloudflare.clef` and `typesafe.jev`; `clef-flash` is not deployed there.
 
 | Model | Origin & Hosting | Modalities & Limits | Best for |
 | --- | --- | --- | --- |
@@ -142,8 +145,16 @@ Send only `model`, `state`, and `questions`.[^litellm-pr-44236][^vllm-decisions-
 
 ### Example: HTTP `POST /api/v1/systemone`
 
+**Python quick start:** in a Python LangChain app, skip the raw HTTP and use
+`DartmouthDecisions` (typed `Noul`/`Choice`/`Score` questions over the same
+endpoint, authenticated with `DARTMOUTH_CHAT_API_KEY`) from the
+[`langchain_dartmouth`](https://github.com/dartmouth/langchain-dartmouth) package —
+see the [langchain-dartmouth skill](../langchain-dartmouth/SKILL.md) and its
+[decision-models cookbook recipe](https://dartmouth.github.io/langchain-dartmouth-cookbook/18-decision-models.html).
+The curl below shows the underlying request contract:
+
 ```bash
-curl -sS "https://chat-preprod.dartmouth.edu/api/v1/systemone" \
+curl -sS "https://chat.dartmouth.edu/api/v1/systemone" \
   -H "Authorization: Bearer $DCHAT_KEY" \
   -H "Content-Type: application/json" \
   -d '{

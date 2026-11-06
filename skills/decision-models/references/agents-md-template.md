@@ -65,7 +65,7 @@ Don't call `decide` for single-item choices you already have in context (such as
 ## Writing application code that calls decision models
 
 - Use the `decision-models` skill.
-- Call `POST https://chat-preprod.dartmouth.edu/api/v1/systemone` for text/JSON System One state (`POST /api/v1/decisions` uses the OpenAI Decisions schema). Authenticate with a Dartmouth Chat API key (`DCHAT_KEY`), kept server-side. Only text/JSON `state` is supported; images are dropped.[^litellm-pr-44236][^vllm-decisions-doc]
+- In Python, prefer `DartmouthDecisions` (`Noul`/`Choice`/`Score`) from the `langchain_dartmouth` package over raw HTTP — see the [langchain-dartmouth docs](https://github.com/dartmouth/langchain-dartmouth) and the [decision-models cookbook recipe](https://dartmouth.github.io/langchain-dartmouth-cookbook/18-decision-models.html). Otherwise call `POST https://chat.dartmouth.edu/api/v1/systemone` for text/JSON System One state (`POST /api/v1/decisions` uses the OpenAI Decisions schema). Authenticate with a Dartmouth Chat API key (`DCHAT_KEY`), kept server-side. Only text/JSON `state` is supported; images are dropped.[^litellm-pr-44236][^vllm-decisions-doc]
 - Default `cloudflare.clef`; use `typesafe.jev` only where labeled examples show Clef failing on reasoning-heavy decisions.
 - Request has only `model`, `state`, `questions` (`1..64` questions, `choice` `2..26` options, `score` `2..10` levels). No other fields.[^vllm-decisions-doc]
 - All independent questions about one state go in one request.

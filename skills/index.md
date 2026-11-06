@@ -8,7 +8,7 @@ okf_version: "0.2"
 * [dartmouth-branding](dartmouth-branding/SKILL.md) - helps users apply Dartmouth College's official brand and design standards when creating communications
 * [research-container-deployment](research-container-deployment/SKILL.md) - End-user guide to deploying containerized research apps on the Dartmouth Computing Dashboard: projects, databases, image builders, Container Deploy, Kubernetes Deploy.
 * [langchain-dartmouth](langchain-dartmouth/SKILL.md) - Build Python LLM apps with the `langchain_dartmouth` package: ChatDartmouth, DartmouthLLM, DartmouthEmbeddings, DartmouthReranker, DartmouthDecisions; authentication, model selection, chains, RAG, decision models.
-* [decision-models](decision-models/SKILL.md) - Build software with Clef and Jev decision models (`cloudflare.clef`, `typesafe.jev`) through the Dartmouth Chat preprod API (`https://chat-preprod.dartmouth.edu/api/v1/systemone`) for fast calibrated routing, classification, scoring, and selection, plus the `decide` MCP server for coding agents.
+* [decision-models](decision-models/SKILL.md) - Build software with Clef and Jev decision models (`cloudflare.clef`, `typesafe.jev`) through the Dartmouth Chat API (`https://chat.dartmouth.edu/api/v1/systemone`) for fast calibrated routing, classification, scoring, and selection, plus the `decide` MCP server for coding agents. In Python, use `DartmouthDecisions` from [langchain-dartmouth](langchain-dartmouth/SKILL.md).
 
 # dartmouth-chat references
 
@@ -22,4 +22,4 @@ okf_version: "0.2"
 # decision-models references
 
 * [AGENTS.md template — LLM vs decision model guidance](decision-models/references/agents-md-template.md) - Drop-in AGENTS.md rules for projects that combine LLMs with Clef decision models.
-* [decide MCP server — decision models as a coding-agent tool](decision-models/references/decide-mcp.md) - Install and configure the `decide` FastMCP 4 server for Claude Code, Codex, goose, OpenCode v2, and Cursor against the Dartmouth Chat preprod API.
+* [decide MCP server — decision models as a coding-agent tool](decision-models/references/decide-mcp.md) - Install and configure the `decide` FastMCP 4 server for Claude Code, Codex, goose, OpenCode v2, and Cursor against the Dartmouth Chat API.

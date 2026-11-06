@@ -1,5 +1,9 @@
 # Skills Update Log
 
+## 2026-11-06
+* **Update**: [decision-models](/decision-models/SKILL.md) and [references/agents-md-template.md](/decision-models/references/agents-md-template.md): cross-references to the new [langchain-dartmouth](/langchain-dartmouth/SKILL.md) skill — point Python users to `DartmouthDecisions` (`langchain_dartmouth`) instead of raw HTTP, linking the library repo and the 18-decision-models cookbook recipe; noted in [index.md](/index.md) (status: draft, unverified).
+* **Update**: [decision-models](/decision-models/SKILL.md), [references/decide-mcp.md](/decision-models/references/decide-mcp.md), [references/agents-md-template.md](/decision-models/references/agents-md-template.md), `scripts/decide_mcp.py`, `scripts/test_decide_mcp.py`, and [index.md](/index.md): switched all endpoint references from the Dartmouth Chat preprod host (`https://chat-preprod.dartmouth.edu/api`) to production Dartmouth Chat (`https://chat.dartmouth.edu/api`); the `DECIDE_BASE_URL` default and test updated to match (status: draft, unverified).
+
 ## 2026-11-05
 * **Creation**: Added [langchain-dartmouth](/langchain-dartmouth/SKILL.md), built from the library source (`../langchain-dartmouth/src/langchain_dartmouth`) and cookbook notebooks (`../langchain-dartmouth-cookbook`): authentication keys, choosing model classes, basic usage quirks, chains/RAG notebook map, and `DartmouthDecisions` usage (status: draft, unverified).
 

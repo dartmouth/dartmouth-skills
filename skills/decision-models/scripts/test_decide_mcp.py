@@ -269,10 +269,10 @@ class DecideTests(Base):
         decide_mcp.run_decision("x", QUESTIONS, cfg=self.cfg(DCHAT_KEY="dk-1", LITELLM_KEY="lk-1"))
         self.assertEqual(Mock.log[-1]["auth"], "Bearer dk-1")
 
-    def test_default_base_url_is_chat_preprod(self):
+    def test_default_base_url_is_chat(self):
         os.environ.clear()
         os.environ.update(self.env)
-        self.assertEqual(decide_mcp.config()["base_url"], "https://chat-preprod.dartmouth.edu/api")
+        self.assertEqual(decide_mcp.config()["base_url"], "https://chat.dartmouth.edu/api")
 
     def test_prewarm(self):
         self.assertTrue(decide_mcp.prewarm(cfg=self.cfg(DECIDE_BACKEND="systemone")))

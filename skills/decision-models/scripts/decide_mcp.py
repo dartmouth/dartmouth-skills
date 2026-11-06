@@ -21,7 +21,7 @@ Backends (DECIDE_BACKEND):
 
 Environment:
   DECIDE_BACKEND            litellm | systemone | cloudflare   (default litellm)
-  DECIDE_BASE_URL           gateway / server base URL          (default https://chat-preprod.dartmouth.edu/api)
+  DECIDE_BASE_URL           gateway / server base URL          (default https://chat.dartmouth.edu/api)
   DECIDE_API_KEY            Dartmouth Chat API key (Settings > Account > API Key); falls back to
                             DCHAT_KEY, then LITELLM_API_KEY, then LITELLM_KEY
   DECIDE_MODEL              default model                      (default cloudflare.clef)
@@ -97,7 +97,7 @@ def config() -> dict[str, Any]:
     env = os.environ
     return {
         "backend": env.get("DECIDE_BACKEND", "litellm").strip().lower(),
-        "base_url": env.get("DECIDE_BASE_URL", "https://chat-preprod.dartmouth.edu/api").rstrip("/"),
+        "base_url": env.get("DECIDE_BASE_URL", "https://chat.dartmouth.edu/api").rstrip("/"),
         "api_key": env.get("DECIDE_API_KEY") or fallback_key(),
         "model": env.get("DECIDE_MODEL", "cloudflare.clef"),
         "routes_raw": env.get("DECIDE_ROUTES") or "",
