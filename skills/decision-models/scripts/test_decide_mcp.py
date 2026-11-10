@@ -109,7 +109,8 @@ class Mock(BaseHTTPRequestHandler):
 
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-        Mock.log.append({"path": self.path, "body": body, "auth": self.headers.get("Authorization")})
+        Mock.log.append({"path": self.path, "body": body, "auth": self.headers.get("Authorization"),
+                         "jev_images": self.headers.get("TypeSafe-Danger-Zone-Images")})
         gateway = self.path.startswith("/gw/")
         if gateway:  # LiteLLM-style /v1/systemone pass-through to the big clef
             self.path = self.path[3:]
@@ -119,7 +120,7 @@ class Mock(BaseHTTPRequestHandler):
         if body.get("model") == "bad":
             return self._send(422, {"error": "model must match ^(cloudflare\\.clef|clef|clef-flash)$"})
         ollama_like = self.path == "/v1/systemone" and not gateway
-        allowed = {"model", "state", "questions", "images"} | ({"keep_alive"} if ollama_like else set())
+        allowed = {"model", "state", "questions", "images", "assets"} | ({"keep_alive"} if ollama_like else set())
         if set(body) - allowed:
             return self._send(400, {"error": f"unexpected {set(body) - allowed}"})
         if len(body["questions"]) > Mock.max_questions:
@@ -234,14 +235,42 @@ class DecideTests(Base):
         with self.assertRaisesRegex(decide_mcp.DecideError, "Could not reach"):
             decide_mcp.run_decision("x", QUESTIONS, cfg=cfg)
 
-    def test_images_via_litellm_need_media_url(self):
+    def test_images_via_litellm_go_to_base_url(self):
         img = self._png()
-        with self.assertRaisesRegex(decide_mcp.DecideError, "DECIDE_MEDIA_BASE_URL"):
-            decide_mcp.run_decision("x", QUESTIONS, image_paths=[img], cfg=self.cfg())
-        decide_mcp.run_decision("x", QUESTIONS, image_paths=[img], cfg=self.cfg(DECIDE_MEDIA_BASE_URL=self.base))
+        decide_mcp.run_decision("x", QUESTIONS, image_paths=[img], cfg=self.cfg())
         call = Mock.log[-1]
         self.assertEqual(call["path"], "/v1/systemone")
         self.assertTrue(call["body"]["images"][0].startswith("data:image/png;base64,"))
+        self.assertNotIn("assets", call["body"])
+        self.assertIsNone(call["jev_images"])
+
+    def test_media_base_url_still_overrides(self):
+        decide_mcp.run_decision("x", QUESTIONS, image_paths=[self._png()], cfg=self.cfg(DECIDE_MEDIA_BASE_URL=f"{self.base}/gw"))
+        self.assertEqual(Mock.log[-1]["path"], "/gw/v1/systemone")
+
+    def test_jev_images_become_referenced_assets(self):
+        img = self._png()
+        for state, check in [
+            ("Look at it.", lambda s: s.endswith("Attached images: image_1.png, image_2.png")),
+            ({"ticket": "t"}, lambda s: s == {"ticket": "t", "attached_images": ["image_1.png", "image_2.png"]}),
+            (["a"], lambda s: s == ["a", "Attached images: image_1.png, image_2.png"]),
+        ]:
+            decide_mcp.run_decision(state, QUESTIONS, model="typesafe.jev", image_paths=[img, img], cfg=self.cfg())
+            call = Mock.log[-1]
+            self.assertNotIn("images", call["body"])
+            self.assertEqual(set(call["body"]["assets"]), {"image_1.png", "image_2.png"})
+            asset = call["body"]["assets"]["image_1.png"]
+            self.assertEqual(asset["format"], "png")
+            self.assertEqual(base64.b64decode(asset["data_base64"])[:4], b"\x89PNG")
+            self.assertTrue(check(call["body"]["state"]), call["body"]["state"])
+            self.assertEqual(call["jev_images"], "true")
+
+    def test_jev_rejects_webp(self):
+        f = tempfile.NamedTemporaryFile(suffix=".webp", delete=False)
+        f.write(b"RIFF0000WEBP"); f.close()
+        self.addCleanup(os.unlink, f.name)
+        with self.assertRaisesRegex(decide_mcp.DecideError, "PNG or JPEG"):
+            decide_mcp.run_decision("x", QUESTIONS, model="typesafe.jev", image_paths=[f.name], cfg=self.cfg())
 
     def test_raw_image_format(self):
         img = self._png()

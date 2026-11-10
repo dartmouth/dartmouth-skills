@@ -6,7 +6,7 @@ type: Agent Skill
 title: Build with Clef and Jev decision models
 resource: https://huggingface.co/Cloudflare/clef
 tags: [decision-models, clef, jev, dartmouth-chat, litellm, vllm, system-one, classification, routing, mcp, fastmcp]
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-29T15:52:00-04:00 }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-09T16:30:00-05:00 }
 stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
@@ -105,7 +105,7 @@ concept and cookbook applies to both Jev and Clef:
 
 - **Base URL:** `https://chat.dartmouth.edu/api` (Dartmouth Chat, which forwards decision requests to Dartmouth's LiteLLM gateway). Paths below are relative to the host.
 - **API key:** your personal Dartmouth Chat key: chat.dartmouth.edu › Profile › Settings › Account › API Key.[^rc-api] It shares your account's credit budget (`GET /api/v1/credits/balance`). Keep it in `DCHAT_KEY` and send it as `Authorization: Bearer $DCHAT_KEY`.
-- **Text and JSON `state` only.** Images sent in `images` are silently dropped (the model answers as if none were attached), and there is no direct vLLM access.
+- **Images:** Clef takes an `images` list (data URLs, at most 2) and Jev takes named `assets` (PNG/JPEG, 280–1568 px per side; also Box questions). Formats, limits and examples are in [references/images.md](references/images.md).
 
 | Use case | Endpoint |
 | --- | --- |
@@ -123,14 +123,14 @@ Check `GET https://chat.dartmouth.edu/api/v1/models` for the deployed IDs. As of
 
 | Model | Origin & Hosting | Modalities & Limits | Best for |
 | --- | --- | --- | --- |
-| **`cloudflare.clef`** (`clef`) | **Cloudflare** open-weight (Apache 2.0, Qwen3.8-27B + joint schema head), **hosted on Dartmouth vLLM**[^hf-clef][^vllm-decisions-doc] | Text & JSON (`16,384` ctx; `choice` `2..26` options) | **Default.** Fast, private classification, routing, triage, tool selection (BANKING77, BFCL), and scoring. |
-| **`typesafe.jev`** (`jev-1.14.0`) | **TypeSafe** proprietary System One flagship model, **cloud-hosted API**[^typesafe-docs] | **Text & JSON only** (`choice` `2..255` options) | Leads on reasoning-heavy decision sets (GPQA, MMLU-Pro, BBH, When2Call). Returns `{"type": "noul", "noul": 0.95}` on `noul` (without the extra `probabilities`/`confidence` fields vLLM adds). |
+| **`cloudflare.clef`** (`clef`) | **Cloudflare** open-weight (Apache 2.0, Qwen3.8-27B + joint schema head), **hosted on Dartmouth vLLM**[^hf-clef][^vllm-decisions-doc] | Text, JSON & images (`16,384` ctx; `choice` `2..26` options; ≤2 images) | **Default.** Fast, private classification, routing, triage, tool selection (BANKING77, BFCL), and scoring. |
+| **`typesafe.jev`** (`jev-1.14.0`) | **TypeSafe** proprietary System One flagship model, **cloud-hosted API**[^typesafe-docs] | Text, JSON & PNG/JPEG images; Box questions (`choice` `2..255` options) | Leads on reasoning-heavy decision sets (GPQA, MMLU-Pro, BBH, When2Call). Returns `{"type": "noul", "noul": 0.95}` on `noul` (without the extra `probabilities`/`confidence` fields vLLM adds). |
 
 Because TypeSafe created the System One API for **Jev** and Cloudflare built **Clef** to speak that exact same schema, switching or A/B testing between `cloudflare.clef` and `typesafe.jev` on `/api/v1/systemone` is just changing `"model"`.
 
 ## Request contract
 
-Send only `model`, `state`, and `questions`.[^litellm-pr-44236][^vllm-decisions-doc] Never add LLM chat fields (`messages`, `temperature`, `max_tokens`, `system`, `stream`, or top-level `instructions`).
+Send only `model`, `state`, and `questions`, plus `images` (Clef) or `assets` (Jev) when you attach images.[^litellm-pr-44236][^vllm-decisions-doc] Never add LLM chat fields (`messages`, `temperature`, `max_tokens`, `system`, `stream`, or top-level `instructions`).
 
 - **`model`** (string): deployed model ID (e.g. `cloudflare.clef`).
 - **`state`** (required, string, JSON object, or JSON array): what the questions are about.

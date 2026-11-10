@@ -23,3 +23,4 @@ okf_version: "0.2"
 
 * [AGENTS.md template — LLM vs decision model guidance](decision-models/references/agents-md-template.md) - Drop-in AGENTS.md rules for projects that combine LLMs with Clef decision models.
 * [decide MCP server — decision models as a coding-agent tool](decision-models/references/decide-mcp.md) - Install and configure the `decide` FastMCP 4 server for Claude Code, Codex, goose, OpenCode v2, and Cursor against the Dartmouth Chat API.
+* [Images with Clef and Jev on the Dartmouth Chat API](decision-models/references/images.md) - Send images to `cloudflare.clef` (`images`) and `typesafe.jev` (`assets`, Box questions); with formats, limits and examples.

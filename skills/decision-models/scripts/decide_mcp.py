@@ -15,7 +15,7 @@ Prompt:   design_questions  (OpenCode shows it as /decide:design_questions)
 Resource: decide://guide    (question-writing rules)
 
 Backends (DECIDE_BACKEND):
-  litellm     POST {DECIDE_BASE_URL}/v1/systemone   (default; Dartmouth Chat API / LiteLLM, text/JSON state)
+  litellm     POST {DECIDE_BASE_URL}/v1/systemone   (default; Dartmouth Chat API / LiteLLM; images OK)
   systemone   POST {DECIDE_BASE_URL}/v1/systemone   (direct vLLM /v1/systemone endpoint; images OK)
   cloudflare  POST https://api.cloudflare.com/client/v4/accounts/{id}/ai/run/@cf/cloudflare/{model}
 
@@ -30,8 +30,8 @@ Environment:
                             A routed model uses its route's settings; unrouted models use the DECIDE_* defaults.
   DECIDE_ESCALATE_MODEL     opt-in cascade: answers flagged unsure on the default model are re-asked
                             once on this model
-  DECIDE_MEDIA_BASE_URL     /v1/systemone base used when images are sent through
-                            the litellm backend (LiteLLM's native route strips media fields)
+  DECIDE_MEDIA_BASE_URL     optional separate /v1/systemone base for requests with images
+                            (litellm backend only; by default images go to DECIDE_BASE_URL)
   DECIDE_IMAGE_FORMAT       dataurl | raw                      (default dataurl)
   DECIDE_KEEP_ALIVE         optional keep_alive field on systemone requests
   DECIDE_PREWARM            auto | on | off  (auto = on for localhost endpoints) (default auto)
@@ -68,6 +68,9 @@ MAX_SCORE_LEVELS = 10
 MAX_IMAGES = 4
 MAX_IMAGE_BYTES = 4 * 1024 * 1024
 IMAGE_MIME = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}
+JEV_MODEL = re.compile(r"jev", re.I)
+JEV_IMAGE_FORMATS = {"image/png": "png", "image/jpeg": "jpeg"}
+JEV_IMAGES_HEADER = "TypeSafe-Danger-Zone-Images"
 RETRYABLE_STATUS = {429, 502, 503, 504}
 SPLITTABLE_STATUS = {400, 413}
 UNSURE_BAND = (0.35, 0.65)
@@ -233,17 +236,35 @@ def build_request(cfg: dict[str, Any], body: dict[str, Any], has_media: bool) ->
         if cfg["keep_alive"]:
             body = {**body, "keep_alive": cfg["keep_alive"]}
     elif backend == "litellm":
-        if has_media:
-            if not cfg["media_base_url"]:
-                raise DecideError("LiteLLM's native route strips images. Set DECIDE_MEDIA_BASE_URL to a vLLM /v1/systemone server, or drop the images.")
-            url = f"{cfg['media_base_url']}/v1/systemone"
-        else:
-            url = f"{cfg['base_url']}/v1/systemone"
+        url = f"{(has_media and cfg['media_base_url']) or cfg['base_url']}/v1/systemone"
     else:
         raise DecideError(f"Unknown DECIDE_BACKEND {backend!r}; use litellm, systemone or cloudflare.")
     if cfg["api_key"]:
         headers["Authorization"] = f"Bearer {cfg['api_key']}"
+    if "assets" in body:
+        headers[JEV_IMAGES_HEADER] = "true"  # Jev images are opt-in per request
     return url, headers, body
+
+
+def as_jev_assets(body: dict[str, Any]) -> dict[str, Any]:
+    """Jev takes images as named `assets` that must be referenced from the request text, not as `images`."""
+    assets: dict[str, Any] = {}
+    for n, url in enumerate(body["images"], 1):
+        mime, _, b64 = url.removeprefix("data:").partition(";base64,")
+        fmt = JEV_IMAGE_FORMATS.get(mime)
+        if fmt is None:
+            raise DecideError(f"Jev accepts PNG or JPEG images only, not {mime or 'that image'}. Convert it first.")
+        assets[f"image_{n}.{fmt}"] = {"data_base64": b64, "format": fmt}
+    note = "Attached images: " + ", ".join(assets)
+    state = body["state"]
+    if isinstance(state, dict):
+        state = {**state, "attached_images": list(assets)}
+    elif isinstance(state, list):
+        state = [*state, note]
+    else:
+        state = f"{state}\n\n{note}"
+    rest = {k: v for k, v in body.items() if k != "images"}
+    return {**rest, "state": state, "assets": assets}
 
 
 def post_json(url: str, headers: dict[str, str], body: dict[str, Any], timeout: float, retries: int = 2) -> dict[str, Any]:
@@ -280,11 +301,18 @@ def unwrap(payload: dict[str, Any]) -> dict[str, Any]:
 
 def send(cfg: dict[str, Any], body: dict[str, Any], has_media: bool = False) -> tuple[dict[str, Any], int]:
     rcfg = route_cfg(cfg, body["model"])
-    if has_media and rcfg["image_format"] == "raw":
+    if has_media and rcfg["backend"] != "cloudflare" and JEV_MODEL.search(body["model"]):
+        body = as_jev_assets(body)
+    elif has_media and rcfg["image_format"] == "raw":
         body = {**body, "images": [i.split(",", 1)[1] if i.startswith("data:") else i for i in body["images"]]}
     url, headers, body = build_request(rcfg, body, has_media)
     started = time.monotonic()
-    result = unwrap(post_json(url, headers, body, rcfg["timeout"]))
+    try:
+        result = unwrap(post_json(url, headers, body, rcfg["timeout"]))
+    except DecideError as e:
+        if "Invalid image dimensions" in str(e):
+            raise DecideError(f"{e}\nJev needs 280-1568 px per side; resize the image.", status=e.status) from None
+        raise
     if not isinstance(result.get("answers"), dict):
         raise DecideError(f"Backend response had no `answers`: {json.dumps(result)[:500]}")
     return result, round((time.monotonic() - started) * 1000)
@@ -694,7 +722,7 @@ def decide(
     state: Annotated[Any, Field(description="Text or JSON the questions are about. Prefer named JSON fields when there are several parts.")],
     questions: Annotated[dict[str, dict[str, Any]], Field(description="Map of question id -> {type, instructions, criteria}. 1..64 questions.")],
     model: Annotated[str | None, Field(description="Override the default model (e.g. cloudflare.clef, typesafe.jev, clef, clef-flash).")] = None,
-    image_paths: Annotated[list[str | None], Field(description="Optional local PNG/JPEG/WebP paths (max 4, <=4 MiB each). Clef only.")] | None = None,
+    image_paths: Annotated[list[str | None], Field(description="Optional local image paths (<=4 MiB each). Clef: PNG/JPEG/WebP, max 2 on Dartmouth Chat. Jev: PNG/JPEG, 280-1568 px per side.")] | None = None,
     escalate: Annotated[bool, Field(description="If the server has an escalation model configured, re-ask unsure answers on it once. Set false to compare models.")] = True,
 ) -> dict[str, Any]:
     try:

@@ -3,7 +3,7 @@ type: Reference
 title: decide MCP server — decision models as a coding-agent tool
 description: Install and configure the `decide` FastMCP 4 server so Claude Code, Codex, goose, OpenCode v2 and Cursor can call Clef or Jev on the Dartmouth Chat API during a session, one input or many at once.
 tags: [decision-models, clef, jev, dartmouth-chat, mcp, fastmcp, claude-code, codex, goose, opencode, cursor, litellm]
-generated: { by: opencode/mistral-large-4, at: 2026-11-06T13:05:00-05:00 }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-09T16:30:00-05:00 }
 stale_after: 2027-01-29T00:00:00Z
 status: draft
 sources:
@@ -102,7 +102,7 @@ to about 0.2 seconds. `decide_batch` packs the same way:
 
 | `DECIDE_BACKEND` | Endpoint | Notes |
 | --- | --- | --- |
-| `litellm` (default) | `{DECIDE_BASE_URL}/v1/systemone` | The Dartmouth Chat API (`https://chat.dartmouth.edu/api`), which forwards to Dartmouth's LiteLLM gateway. Use your Dartmouth Chat API key (Profile › Settings › Account › API Key)[^rc-api] in `DECIDE_API_KEY` or `DCHAT_KEY`. It serves System One payloads on `/api/v1/systemone` and OpenAI Decisions payloads on `/api/v1/decisions`.[^litellm-pr-44236] Only text/JSON `state` is supported; images are dropped. |
+| `litellm` (default) | `{DECIDE_BASE_URL}/v1/systemone` | The Dartmouth Chat API (`https://chat.dartmouth.edu/api`), which forwards to Dartmouth's LiteLLM gateway. Use your Dartmouth Chat API key (Profile › Settings › Account › API Key)[^rc-api] in `DECIDE_API_KEY` or `DCHAT_KEY`. It serves System One payloads on `/api/v1/systemone` and OpenAI Decisions payloads on `/api/v1/decisions`.[^litellm-pr-44236] Pass images with `image_paths`. For Jev, the server converts them to `assets` automatically; see [images.md](images.md). |
 | `cloudflare` | Workers AI `ai/run/@cf/cloudflare/{model}` | Needs `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_AUTH_TOKEN`; the `{success, result}` envelope is unwrapped.[^cf-clef] |
 
 **Diagnostics.** Clef on vLLM (behind LiteLLM) returns per-question `diagnostics` with

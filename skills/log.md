@@ -1,5 +1,8 @@
 # Skills Update Log
 
+## 2026-11-09
+* **Update**: [decision-models](/decision-models/SKILL.md), new [references/images.md](/decision-models/references/images.md), [references/decide-mcp.md](/decision-models/references/decide-mcp.md), `scripts/decide_mcp.py` and `scripts/test_decide_mcp.py`: image support on `https://chat.dartmouth.edu/api`. Clef takes an `images` list (data URLs, at most 2) and Jev takes referenced `assets` (PNG/JPEG, 280–1568 px per side) and Box questions, also via `input_image` on `/api/v1/decisions`. Written for the production rollout on 2026-11-10; formats and limits were tested live on preprod on 2026-11-09. `decide` now sends images on the default `litellm` backend without needing `DECIDE_MEDIA_BASE_URL` (still an optional override), converts images to referenced `assets` with the `TypeSafe-Danger-Zone-Images` header for Jev models, rejects WebP for Jev, and explains Jev's minimum image size on error; tests added (status: draft, unverified).
+
 ## 2026-11-06
 * **Update**: [references/decide-mcp.md](/decision-models/references/decide-mcp.md): the OpenCode v2 section now says where the config file goes (project `opencode.json` or global `~/.config/opencode/opencode.json`, or `opencode mcp add decide --global`) (status: draft, unverified).
 * **Update**: `scripts/decide_mcp.py`, `scripts/test_decide_mcp.py`, and [references/decide-mcp.md](/decision-models/references/decide-mcp.md): `decision_models` now always lists the model each endpoint is configured for (default or `DECIDE_ROUTES` key) first, even when the gateway serves it under a different name and omits it from `/v1/models` (seen on `https://chat.dartmouth.edu/api`, which serves `cloudflare.clef` as `clef`); tests added (status: draft, unverified).
