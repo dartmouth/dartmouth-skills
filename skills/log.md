@@ -1,5 +1,8 @@
 # Skills Update Log
 
+## 2026-11-11
+* **Creation**: Added [presentation-design](/presentation-design/SKILL.md): design philosophy for slide decks presented live by a speaker — assertion-evidence slide form, anchors vs sentences, density limits, sequencing, builds, code on slides, speaker notes, and decks that get shared afterward. Grounded in Mayer's multimedia learning research and Alley's assertion-evidence work (status: draft, unverified).
+
 ## 2026-11-09
 * **Update**: [decision-models](/decision-models/SKILL.md), new [references/images.md](/decision-models/references/images.md), [references/decide-mcp.md](/decision-models/references/decide-mcp.md), `scripts/decide_mcp.py` and `scripts/test_decide_mcp.py`: image support on `https://chat.dartmouth.edu/api`. Clef takes an `images` list (data URLs, at most 2) and Jev takes referenced `assets` (PNG/JPEG, 280–1568 px per side) and Box questions, also via `input_image` on `/api/v1/decisions`. Written for the production rollout on 2026-11-10; formats and limits were tested live on preprod on 2026-11-09. `decide` now sends images on the default `litellm` backend without needing `DECIDE_MEDIA_BASE_URL` (still an optional override), converts images to referenced `assets` with the `TypeSafe-Danger-Zone-Images` header for Jev models, rejects WebP for Jev, and explains Jev's minimum image size on error; tests added (status: draft, unverified).
 

@@ -9,6 +9,7 @@ okf_version: "0.2"
 * [research-container-deployment](research-container-deployment/SKILL.md) - End-user guide to deploying containerized research apps on the Dartmouth Computing Dashboard: projects, databases, image builders, Container Deploy, Kubernetes Deploy.
 * [langchain-dartmouth](langchain-dartmouth/SKILL.md) - Build Python LLM apps with the `langchain_dartmouth` package: ChatDartmouth, DartmouthLLM, DartmouthEmbeddings, DartmouthReranker, DartmouthDecisions; authentication, model selection, chains, RAG, decision models.
 * [decision-models](decision-models/SKILL.md) - Build software with Clef and Jev decision models (`cloudflare.clef`, `typesafe.jev`) through the Dartmouth Chat API (`https://chat.dartmouth.edu/api/v1/systemone`) for fast calibrated routing, classification, scoring, and selection, plus the `decide` MCP server for coding agents. In Python, use `DartmouthDecisions` from [langchain-dartmouth](langchain-dartmouth/SKILL.md).
+* [presentation-design](presentation-design/SKILL.md) - Design philosophy for live-presentation slide decks: assertion-evidence form, anchors vs sentences, density limits, builds, code on slides, speaker notes, and shared-deck afterlife.
 
 # dartmouth-chat references
 
