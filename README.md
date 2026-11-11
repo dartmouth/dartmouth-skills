@@ -4,6 +4,9 @@
 
 Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmouth services. Every markdown file carries [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md) frontmatter, so each file records where it came from and when it should be refreshed.
 
+> [!WARNING]
+> These skills are a Dartmouth community-maintained resource and do not represent official approval of Dartmouth standards or policies. Read and vet these skills before giving them to your agent.
+
 ## Skills
 
 | Skill | What it does |
@@ -25,7 +28,7 @@ npx skills add dartmouth/dartmouth-skills@dartmouth-chat
 npx skills add dartmouth/dartmouth-skills@dartmouth-chat -g   # global: ~/.agents/skills/
 
 # Claude Code plugin marketplace
-/plugin marketplace add <org>/dartmouth-skills
+/plugin marketplace add dartmouth/dartmouth-skills
 /plugin install dartmouth-skills@dartmouth-skills
 ```
 
