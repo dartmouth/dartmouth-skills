@@ -1,0 +1,19 @@
+{
+  "jwt": "<encoded JWT — opaque string, decode via jwt.io or a JWT library to inspect the payload>",
+  "payload": {
+    "sub": "f0000zz",
+    "aud": "https://api.dartmouth.edu",
+    "iss": "https://api.dartmouth.edu/api/jwt",
+    "name": "Sample Service Account",
+    "exp": 1774241483,
+    "iat": 1774230683,
+    "email": "sample.service.account@dartmouth.edu",
+    "scope": "urn:dartmouth:people:private urn:dartmouth:students:read.sensitive urn:dartmouth:people:read.sensitive urn:dartmouth:employees:read.sensitive"
+  },
+  "accepted_scopes": [
+    "urn:dartmouth:people:private",
+    "urn:dartmouth:students:read.sensitive",
+    "urn:dartmouth:people:read.sensitive",
+    "urn:dartmouth:employees:read.sensitive"
+  ]
+}

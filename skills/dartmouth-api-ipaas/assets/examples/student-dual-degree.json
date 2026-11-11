@@ -1,0 +1,84 @@
+{
+  "netid": "f0000ca",
+  "term_code_eff": "202506",
+  "is_future_status": false,
+  "is_campus_resident": false,
+  "has_tin": false,
+  "student_type_id": "G",
+  "admission_type_id": "GN",
+  "school_id": "TH",
+  "school_code": "TH",
+  "student_status_id": "AS",
+  "grad_term": "202603",
+  "current_admit_term_code": "202506",
+  "class_year": "TH",
+  "other_attributes": [
+    { "code": "ENDD", "description": "Engineering Dual Degree", "term_code_effective": "202309" },
+    { "code": "ENDD", "description": "Engineering Dual Degree", "term_code_effective": "202406" }
+  ],
+  "academic_history": [
+    {
+      "institution": { "name": "Dartmouth - Undergraduate - College of Arts & Science-UG", "type": "College", "category": null },
+      "start_date": null,
+      "completion_date": null,
+      "admit_term_code": "202309",
+      "degree": { "level": "Undeclared", "status": "Sought", "disciplines": [{ "id": "0000", "name": "Undeclared", "type": "MAJOR", "concentrations": [] }] },
+      "source": null
+    },
+    {
+      "institution": { "name": "Dartmouth - Thayer School of Engineering", "type": "College", "category": null },
+      "start_date": null,
+      "completion_date": null,
+      "admit_term_code": "202506",
+      "degree": {
+        "level": "Bachelor of Engg.",
+        "status": "Sought",
+        "disciplines": [
+          { "id": "ENGG", "name": "Engineering", "type": "MAJOR", "concentrations": [{ "id": "EEEL", "name": "Electrical Engg." }] },
+          { "id": "EEEL", "name": "Electrical Engg.", "type": "MINOR" }
+        ]
+      },
+      "source": null
+    },
+    {
+      "institution": { "name": "Sample Liberal Arts College", "type": "College", "category": null },
+      "start_date": "2021-09-01T04:00:00Z",
+      "completion_date": "2025-06-01T04:00:00Z",
+      "admit_term_code": null,
+      "degree": { "level": "Bachelor of Arts", "status": "Awarded", "disciplines": [{ "name": "Physics", "type": "MAJOR" }] },
+      "source": { "code": "CTR1", "name": "College Transcript 1*" }
+    },
+    {
+      "institution": { "name": "Sample Home School Clearing House", "type": "High School", "category": "Home Schooled" },
+      "start_date": null,
+      "completion_date": "2020-05-25T04:00:00Z",
+      "admit_term_code": null,
+      "degree": null,
+      "source": { "code": "UHT1", "name": "High School Transcript 1" }
+    }
+  ],
+  "advisors": [
+    { "netid": "d0000cb", "type": "Thayer Assistant Dean", "advisor_type_id": "ETHD", "is_primary": false, "term_code_effective": "202506" },
+    { "netid": "d0000cc", "type": "Undergraduate Class Dean", "advisor_type_id": "UCD", "is_primary": true, "term_code_effective": "202309" },
+    { "netid": "f0000cd", "type": "Thayer Advisor", "advisor_type_id": "EAD", "is_primary": true, "term_code_effective": "202506" }
+  ],
+  "varsity_sports": [],
+  "is_fysep_participant": false,
+  "is_firstgen_student": false,
+  "class": null,
+  "curriculum": [
+    { "term_code": "202506", "term_code_end": null, "school_id": "TH", "college_id": "TH", "degree_id": "BE", "program": "THENGBE", "program_name": "Thayer BE Curriculum", "priority": 1 }
+  ],
+  "status_history": [
+    { "term_code_eff": "202309", "student_type_id": "S", "school_id": "UG", "student_status_id": "AS", "grad_term": "202703", "class_year": "UG", "class_code": "FR" },
+    { "term_code_eff": "202506", "student_type_id": "G", "school_id": "TH", "student_status_id": "AS", "grad_term": "202603", "class_year": "TH", "class_code": null }
+  ],
+  "checkin_history": [
+    { "school_id": "UG", "term_code": "202309", "start_date": "2023-09-10T22:12:35Z", "is_confirmed": true, "confirmed_date": "2023-09-10T22:19:29Z" },
+    { "school_id": "TH", "term_code": "202506", "start_date": "2025-06-27T19:53:22Z", "is_confirmed": true, "confirmed_date": "2025-06-27T20:11:08Z" }
+  ],
+  "dplans": [
+    { "term_code": "202309", "dplan_id": "R", "dplan_description": "Resident", "dplan_source_id": "OCP", "dplan_source_description": "OCP Accepted" },
+    { "term_code": "202506", "dplan_id": "E R", "dplan_description": "Thayer-Registered", "dplan_source_id": "OE", "dplan_source_description": "Original Entry" }
+  ]
+}

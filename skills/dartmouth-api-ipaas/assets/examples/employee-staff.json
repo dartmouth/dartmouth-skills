@@ -1,0 +1,55 @@
+{
+  "netid": "d00000a",
+  "home_department": "Facilities Management",
+  "person_type": ["Employee"],
+  "primary_payroll": "Monthly",
+  "is_benefits_eligible": true,
+  "is_med_enrolled": false,
+  "i9_date": null,
+  "i9_status": "Yes",
+  "postdoc": false,
+  "jobs": [
+    {
+      "job_group": "Staff",
+      "job_base_status": "Regular",
+      "job_current_status": "Active",
+      "job_type": "Exempt Staff",
+      "position_title": "Operations Manager",
+      "position_number": "0000000",
+      "payroll_type": "Monthly",
+      "original_job_start_date": "2021-03-01T05:00:00Z",
+      "job_start_date": "2024-09-01T04:00:00Z",
+      "job_end_date": null,
+      "is_home_department": true,
+      "location": {
+        "description": "Sample Hall, Room 100",
+        "building_id": "0000",
+        "space_id": "100"
+      },
+      "supervisor_netid": "f00000b",
+      "assignment_number": "00000-1",
+      "job_organization": {
+        "organization_namespace": "human_resources",
+        "id": "000000000000000000000000",
+        "organization": "Facilities Management",
+        "division": "Finance and Admin",
+        "sub_division_or_school": "Facilities",
+        "academic_division": "Facilities",
+        "department": "Facilities Management",
+        "unit": "Facilities Management",
+        "subunit": "Facilities Management"
+      },
+      "maintenance_crew": {
+        "crew_code": null,
+        "crew_shift": null,
+        "shop_lead": false
+      }
+    }
+  ],
+  "faculty_data": null,
+  "emeritus_data": null,
+  "schedule_data": null,
+  "last_date_employed": null,
+  "last_date_paid": "2026-03-01T05:00:00Z",
+  "cache_date": "2026-03-23T01:29:37Z"
+}

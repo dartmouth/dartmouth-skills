@@ -1,0 +1,36 @@
+{
+  "netid": "f00000e",
+  "home_department": null,
+  "person_type": ["ExEmployee"],
+  "primary_payroll": null,
+  "is_benefits_eligible": false,
+  "is_med_enrolled": false,
+  "i9_date": null,
+  "i9_status": null,
+  "postdoc": null,
+  "jobs": [],
+  "faculty_data": null,
+  "emeritus_data": {
+    "salutation": "Professor",
+    "year_of_appointment": "1990",
+    "emeritus_title": "Research Professor, Sample School of Engineering, Emeritus",
+    "email_after_termination": "YES",
+    "status_grant_year": "2020",
+    "status_grant_month": "June",
+    "emeritus_organization": {
+      "organization_namespace": "human_resources",
+      "id": "000000000000000000000003",
+      "organization": "Sample School",
+      "division": "Provosts Office",
+      "sub_division_or_school": "Sample School",
+      "academic_division": "Sample School",
+      "department": "Sample School",
+      "unit": "Sample School",
+      "subunit": "Sample School"
+    }
+  },
+  "schedule_data": null,
+  "last_date_employed": null,
+  "last_date_paid": null,
+  "cache_date": "2026-03-23T01:29:37Z"
+}

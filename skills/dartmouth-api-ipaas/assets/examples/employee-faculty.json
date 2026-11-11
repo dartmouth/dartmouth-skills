@@ -1,0 +1,88 @@
+{
+  "netid": "f00000c",
+  "home_department": "Sample Department",
+  "person_type": ["Employee"],
+  "primary_payroll": "Monthly",
+  "is_benefits_eligible": true,
+  "is_med_enrolled": true,
+  "i9_date": null,
+  "i9_status": "Waived",
+  "postdoc": false,
+  "jobs": [
+    {
+      "job_group": "Faculty",
+      "job_base_status": "Regular",
+      "job_current_status": "Active",
+      "job_type": "Faculty",
+      "position_title": "Faculty",
+      "position_number": "0000000",
+      "payroll_type": "Monthly",
+      "original_job_start_date": "2022-11-15T05:00:00Z",
+      "job_start_date": "2024-12-31T05:00:00Z",
+      "job_end_date": null,
+      "is_home_department": true,
+      "location": {
+        "description": "Sample Engineering Center, Room 000",
+        "building_id": "0000",
+        "space_id": "000"
+      },
+      "supervisor_netid": "f00000d",
+      "assignment_number": "00000-2",
+      "job_organization": {
+        "organization_namespace": "human_resources",
+        "id": "000000000000000000000001",
+        "organization": "Sample Department",
+        "division": "Provosts Office",
+        "sub_division_or_school": "Sample School",
+        "academic_division": "Sample School",
+        "department": "Sample School",
+        "unit": "Sample Department",
+        "subunit": "Sample Department"
+      },
+      "maintenance_crew": {
+        "crew_code": null,
+        "crew_shift": null,
+        "shop_lead": false
+      }
+    }
+  ],
+  "faculty_data": [
+    {
+      "organization": {
+        "org_type": "School or Sub Division",
+        "name": "Sample School",
+        "long_name": "Sample School of Engineering",
+        "division": "Provosts Office",
+        "school": "Sample School",
+        "sub_division": "Sample School",
+        "academic_division": "Sample School",
+        "sub_division_or_school": "Sample School",
+        "department": "Sample School",
+        "unit": "Sample School",
+        "subunit": "Sample School",
+        "org_parent_id": "000000000000000000000002",
+        "gl_org_code": null,
+        "id": "000000000000000000000003"
+      },
+      "as_of_indicator": "Today",
+      "professional_title": "Professor of Engineering",
+      "faculty_rank": {
+        "code": "10",
+        "description": "Professor",
+        "status": null,
+        "rank_date": "1996-07-01T04:00:00Z"
+      },
+      "tenure_status": {
+        "code": "T",
+        "description": "Tenured",
+        "tenure_date": "1996-07-01T04:00:00Z",
+        "asst_prof_start_term": "200006"
+      }
+    }
+  ],
+  "emeritus_data": null,
+  "schedule_data": null,
+  "last_date_employed": null,
+  "last_date_paid": "2026-03-01T05:00:00Z",
+  "cache_date": "2026-03-23T01:29:37Z"
+}

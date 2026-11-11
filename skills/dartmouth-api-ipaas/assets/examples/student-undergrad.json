@@ -1,0 +1,79 @@
+{
+  "netid": "f0000aa",
+  "academic_history": [
+    {
+      "admit_term_code": null,
+      "completion_date": "2017-05-25T04:00:00Z",
+      "degree": null,
+      "institution": {
+        "category": "Independent Religious",
+        "name": "Sample Preparatory High School",
+        "type": "High School"
+      },
+      "source": { "code": "UHT1", "name": "High School Transcript 1" },
+      "start_date": null
+    },
+    {
+      "admit_term_code": "201503",
+      "completion_date": null,
+      "degree": {
+        "disciplines": [
+          { "concentrations": [], "id": "PSYC", "name": "Psychology", "type": "MAJOR" },
+          { "id": "EDUC", "name": "Education", "type": "MINOR" },
+          { "id": "THEA", "name": "Theater", "type": "MINOR" }
+        ],
+        "level": "Bachelor of Arts",
+        "status": "Sought"
+      },
+      "institution": {
+        "category": null,
+        "name": "Dartmouth - Undergraduate - Class of 2019",
+        "type": "College"
+      },
+      "source": null,
+      "start_date": null
+    }
+  ],
+  "admission_type_id": "ST",
+  "advisors": [
+    { "is_primary": false, "netid": "d0000ab", "term_code_effective": "201609", "type": "Undergraduate Class Dean" },
+    { "is_primary": true, "netid": "d0000ac", "term_code_effective": "201609", "type": "Faculty Advisor (first year)" }
+  ],
+  "class": { "code": "JR", "name": "Junior (UG)" },
+  "class_year": "19",
+  "current_admit_term_code": "201503",
+  "curriculum": [
+    { "college_id": "19", "degree_id": "AB", "program": null, "school_id": "UG", "term_code": "201806", "term_code_end": null }
+  ],
+  "dplans": [
+    { "dplan_description": "Resident", "dplan_id": "R", "dplan_source_description": "Registrar Action", "dplan_source_id": "PHL", "term_code": "201909" },
+    { "dplan_description": "Resident", "dplan_id": "R", "dplan_source_description": "Registrar Action", "dplan_source_id": "PHL", "term_code": "202001" }
+  ],
+  "gpa_history": {
+    "cumulative_gpa": [
+      { "gpa_type_ind": "I", "gpa_value": "3.14", "school_id": "UG" },
+      { "gpa_type_ind": "O", "gpa_value": "3.14", "school_id": "UG" }
+    ],
+    "term_gpa": [
+      { "gpa_type_ind": "I", "gpa_value": "3.33", "school_id": "UG", "sis_term_code": "202003" },
+      { "gpa_type_ind": "I", "gpa_value": "3.53", "school_id": "UG", "sis_term_code": "202001" }
+    ]
+  },
+  "grad_term": "202103",
+  "is_firstgen_student": false,
+  "is_future_status": false,
+  "is_fysep_participant": false,
+  "other_attributes": [
+    { "code": "EABE", "description": "Thayer AB/BE Students", "term_code_effective": "201903" }
+  ],
+  "school_code": "UG",
+  "school_id": "UG",
+  "status_history": [
+    { "class_code": "FR", "class_year": "19", "grad_term": "201903", "school_id": "UG", "student_status_id": "AS", "student_type_id": "N", "term_code_eff": "201509" },
+    { "class_code": "SR", "class_year": "19", "grad_term": "201903", "school_id": "UG", "student_status_id": "GS", "student_type_id": "C", "term_code_eff": "201906" }
+  ],
+  "student_status_id": "AS",
+  "student_type_id": "C",
+  "term_code_eff": "201909",
+  "varsity_sports": []
+}
