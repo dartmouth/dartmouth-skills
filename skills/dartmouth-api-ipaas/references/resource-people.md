@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI People API"
+description: "Endpoints and fields of the DartAPI People API: directory data merged from HRS, SIS, IDM and Advancement."
+tags: [dartmouth-api, people, idm]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # People API
 
 High-level directory information (name, email, affiliation, contact info) about identities at Dartmouth. Data is sourced from whichever backend system "owns" the identity: HRS for employees, SIS for students, IDM for identities with no HR/SIS affiliation (sponsored/service/guest accounts), and today, Alumni too (via IDM — see `known-gaps.md`, there is no dedicated Alumni endpoint).

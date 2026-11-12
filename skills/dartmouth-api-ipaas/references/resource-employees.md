@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI Employees API"
+description: "Endpoints, fields, jobs, and controlled-vocabulary codes of the DartAPI Employees API (HRS-sourced)."
+tags: [dartmouth-api, employees, hrs]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Employees API
 
 Returns information about current/future active employees. **Does not** provide historical position data — only current-as-of-today jobs. Termination data (`last_date_employed`) is only populated for ExEmployees within their 18-month post-termination window.

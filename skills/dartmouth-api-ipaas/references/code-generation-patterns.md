@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "Code-generation patterns for DartAPI clients"
+description: "Language-neutral behavior spec for generating DartAPI clients: JWT caching, scope-aware resource clients, pagination, netid lookups, and error handling."
+tags: [dartmouth-api, code-generation, pagination, error-handling]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Code-generation patterns for DartAPI clients
 
 These are language-neutral patterns to translate idiomatically into whatever language/framework the target repository already uses. **Do not default to one language** — detect the target project's conventions first (see SKILL.md's workflow), then apply these patterns using that project's existing HTTP client, config/secrets loading, and error-handling style. Treat this file as the spec for *behavior*, not as a template to transliterate line-by-line.

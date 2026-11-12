@@ -1,5 +1,8 @@
 # Skills Update Log
 
+## 2026-11-12
+* **Creation**: Added [dartmouth-api-ipaas](/dartmouth-api-ipaas/SKILL.md) and its [references](/dartmouth-api-ipaas/references/): integration and reference guide for Dartmouth's iPaaS API (DartAPI) covering JWT auth and scopes, request/response conventions, code-generation patterns, the employees, students, people and assets resources, backend systems, and known documentation gaps. Added OKF frontmatter (`type`, `title`, `tags`, `sources`) to `SKILL.md` and every reference, set `status: draft` (unverified), shortened the `description` to under 1024 characters, and fixed `name` to match the directory (`dartmouth-api-ipaas`). Removed all references to DartPulse (no longer in use) from the skill.
+
 ## 2026-11-11
 * **Creation**: Added [presentation-design](/presentation-design/SKILL.md): design philosophy for slide decks presented live by a speaker — assertion-evidence slide form, anchors vs sentences, density limits, sequencing, builds, code on slides, speaker notes, and decks that get shared afterward. Grounded in Mayer's multimedia learning research and Alley's assertion-evidence work (status: draft, unverified).
 

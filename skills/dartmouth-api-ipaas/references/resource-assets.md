@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI Assets API"
+description: "Endpoints and fields of the DartAPI Assets API (identification photos sourced from Lenel)."
+tags: [dartmouth-api, assets, photos]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Assets API
 
 Returns metadata and binary content for digital assets. Currently the only asset type available is identification photo images of people (sourced from Lenel — see `systems-glossary.md`).

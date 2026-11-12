@@ -1,21 +1,14 @@
 ---
-name: dartmouth-api
-description: >
-  Use this skill for anything involving Dartmouth College's internal iPaaS /
-  enterprise API — also called "DartAPI", reachable at api.dartmouth.edu (and
-  api-preprod.dartmouth.edu for pre-prod). Trigger it for: (1) scaffolding or
-  generating integration code in ANY language or framework — JWT acquisition
-  via POST /api/jwt, scope handling (urn:dartmouth:... scopes), token
-  caching/refresh, HTTP request wrappers, pagination via continuation_key,
-  filter-query building, and error handling for 401/404/422; (2) looking up
-  endpoint schemas, fields, or controlled-vocabulary codes for the employees,
-  students, people, or assets endpoints (e.g. job_type, faculty_rank_code,
-  dartmouth_affiliation, i9_status); (3) questions about Dartmouth's backend
-  source systems (HRS, SIS/Banner, IDM, Advancement/ADV, Lenel, CSGOLD,
-  DartPulse) as they relate to this API. Trigger even without the term
-  "DartAPI" — also match "the Dartmouth API", "the employees/students/people
-  endpoint", "api.dartmouth.edu", "api-preprod", "urn:dartmouth:...", or a
-  request to build a client/wrapper for Dartmouth HR/student/people data.
+name: dartmouth-api-ipaas
+description: Build integrations with, and look up data in, Dartmouth's enterprise iPaaS API (DartAPI, api.dartmouth.edu). Use when scaffolding client code in any language (JWT via POST /api/jwt, urn:dartmouth scopes, token caching, continuation_key pagination, filters, 401/404/422 handling), when looking up employees, students, people or assets endpoint schemas and controlled-vocabulary codes, or when asking which backend system (HRS, SIS/Banner, IDM, Advancement, Lenel, CSGOLD) owns a field. Also match "the Dartmouth API", "api-preprod", or "urn:dartmouth:...".
+type: Agent Skill
+title: Dartmouth iPaaS API (DartAPI) — integration and reference guide
+tags: [dartmouth-api, dartapi, ipaas, jwt, employees, students, people, assets, integration]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
 ---
 
 # Dartmouth iPaaS API (DartAPI)
@@ -37,7 +30,7 @@ DartAPI is Dartmouth College's internal enterprise API, aggregating identity, HR
 | Employees endpoint/fields | `references/resource-employees.md` |
 | People endpoint/fields | `references/resource-people.md` |
 | Students endpoint/fields | `references/resource-students.md` |
-| Which backend system (HRS/SIS/IDM/ADV/Lenel/CSGOLD/DartPulse) owns a field | `references/systems-glossary.md` |
+| Which backend system (HRS/SIS/IDM/ADV/Lenel/CSGOLD) owns a field | `references/systems-glossary.md` |
 | Generating client/integration code in any language | `references/code-generation-patterns.md` |
 | **Anything adjacent to a documented gap (see below)** | `references/known-gaps.md` — **load this first**, before answering |
 

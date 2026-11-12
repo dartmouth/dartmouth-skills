@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI Students API"
+description: "Endpoints, fields, status history and academic data of the DartAPI Students API (Banner-sourced)."
+tags: [dartmouth-api, students, sis, banner]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Students API
 
 Returns information about every student represented in Banner — if a person has a Banner `SGBSTDN` record, they're in this API (see `systems-glossary.md`). Includes current status, complete academic history (including non-Dartmouth institutions), advisors, and full status/dplan/GPA history.

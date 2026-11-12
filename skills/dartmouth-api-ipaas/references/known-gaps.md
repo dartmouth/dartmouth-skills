@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI known documentation gaps"
+description: "What the DartAPI documentation does not cover (rate limits, writes, webhooks, SDKs, versioning, error codes); read before answering adjacent questions."
+tags: [dartmouth-api, gaps, limitations]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Known gaps — read before answering anything adjacent to these topics
 
 This is the single source of truth for what Dartmouth's DartAPI documentation does **not** cover. Every other reference file in this skill links back here instead of restating these points. When a task touches any item below, say so explicitly and suggest the developer confirm with the DartAPI team — do not invent a plausible-sounding number, payload shape, or endpoint to fill the gap.
@@ -6,7 +18,7 @@ This is the single source of truth for what Dartmouth's DartAPI documentation do
 - **No write examples for any resource.** The intro doc describes generic POST (create) / PUT (update) / DELETE semantics, and a `urn:dartmouth:general_ledger:write.transaction` scope is named in the auth doc, but no resource doc shows an actual write request, request body, or response for any endpoint (employees, students, people, assets, or GL). Every documented example across all resources is a GET. Do not fabricate a write payload shape.
 - **No webhook/push notifications.** `references/resource-people.md` mentions a polling-based "Resource Changes" subscription mechanism, but the actual subscription endpoint, request format, and response/payload shape are never documented. A "future enhancement may support webhook notifications" per the source doc — webhooks do not exist today.
 - **No SDK or client library.** There is no official JS/Python/Ruby/etc. client, and no OpenAPI/Swagger or Postman collection exists in the source material. All code must be hand-written against the documented conventions in `references/code-generation-patterns.md`.
-- **No consolidated error-code reference beyond 401 / 404 / 422.** These three are the only client error codes documented anywhere, each returning `{"message": "..."}`. 50x errors are mentioned only in the context of backend-system outages (see DartPulse), not as a documented contract.
+- **No consolidated error-code reference beyond 401 / 404 / 422.** These three are the only client error codes documented anywhere, each returning `{"message": "..."}`. No 50x error contract is documented.
 - **Versioning scheme is unclear.** The introduction doc's client-error example shows a URL containing `/api/v2/...`, but this appears to be unedited boilerplate copied from generic Rails-API-docs examples (Every other real example in every other doc uses unversioned `/api/...` paths, e.g. `/api/employees/{netid}`). Don't treat `/api/v2/` as a real, callable path — the real base paths are `/api/` (prod) and the pre-prod equivalent, with no version segment.
 - **No documented prod vs. pre-prod differences in scopes or data.** Pre-prod (`api-preprod.dartmouth.edu`) is mentioned only as a testing environment; nothing states whether it has separate API keys, separate scope grants, or synthetic vs. real data.
 - **`checkin_history` is undocumented in prose.** It appears as a populated field in every students-API sample payload but has no entry in `600_students.md`'s field-description tables. Its shape (from samples): an array of `{school_id, term_code, start_date, is_confirmed, confirmed_date}` objects — treat this as observed-from-samples only, not as a documented contract, and flag it as such if asked.

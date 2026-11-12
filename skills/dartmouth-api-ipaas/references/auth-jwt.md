@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI authentication — login service and JWT"
+description: "Obtain, cache and refresh DartAPI JWTs: API keys, scopes, the three-tier non-inheriting authorization model, and accepted_scopes behavior."
+tags: [dartmouth-api, jwt, auth, scopes]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Authentication: the DartAPI Login Service (JWT)
 
 Every call to DartAPI (other than the login call itself) requires a short-lived JWT in an `Authorization: Bearer {jwt}` header. The JWT is obtained by exchanging a long-lived API key for it.

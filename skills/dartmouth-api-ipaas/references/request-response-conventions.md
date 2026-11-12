@@ -1,3 +1,15 @@
+---
+type: Reference
+title: "DartAPI request/response conventions"
+description: "Shared filtering, wildcard, pagination, and response data-type and naming conventions across DartAPI resources."
+tags: [dartmouth-api, filtering, pagination, conventions]
+status: draft
+sources:
+  - id: dartapi-portal
+    resource: https://developer.dartmouth.edu
+    title: Dartmouth Developer Portal (API keys and DartAPI documentation)
+---
+
 # Request/response conventions shared across resource APIs
 
 These conventions apply to `employees`, `people`, and `students` (and any future filterable resource) — read this once, not per-resource.
