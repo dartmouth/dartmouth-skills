@@ -37,7 +37,7 @@ sources:
    - `stale_after` is an absolute timestamp. Set it no more than 3 months out for content that names models or prices.
    - When a file is past `stale_after`, re-check its sources before trusting it.
 7. **Keep the `SKILL.md` body lean (target under 300 lines, excluding frontmatter).** Move long configs and walkthroughs into `references/` and link to them by relative path.
-8. **Public information only.** No internal infrastructure details, secrets, keys, or non-public vendor terms.
+8. **Public information only.** No internal infrastructure details, secrets, keys, or non-public vendor terms. Skills dealing with internal APIs or data belong in the Dartmouth-only sibling repo https://github.com/dartmouth/dartmouth-internal-skills, not here.
 9. **Record every change.** Add an entry to `skills/log.md` (newest first, `## YYYY-MM-DD`). Update `skills/index.md` when adding a skill.
 
 # Validate

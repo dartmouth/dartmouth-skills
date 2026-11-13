@@ -4,10 +4,13 @@
 
 Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmouth services. Every markdown file carries [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md) frontmatter, so each file records where it came from and when it should be refreshed.
 
+> [!IMPORTANT]
+> **Internal skills live in a separate repo.** Skills that deal with Dartmouth's internal APIs or internal data are **not** in this public repo. They can be found in the Dartmouth-only sibling repo: **https://github.com/dartmouth/dartmouth-internal-skills**
+
 > [!WARNING]
 > These skills are a Dartmouth community-maintained resource and do not represent official approval of Dartmouth standards or policies. Read and vet these skills before giving them to your agent.
 
-## Skills
+## Example Skills
 
 | Skill | What it does |
 |---|---|
@@ -22,7 +25,7 @@ Agent Skills ([agentskills.io](https://agentskills.io/specification)) for Dartmo
 (change dartmouth-chat to a different skill above if you want)
 
 ```bash
-# Any agent (Claude Code, Codex, Cursor, Copilot, …) → ./.agents/skills/ 
+# Any agent (Claude Code, Codex, Cursor, Copilot, …) → ./.agents/skills/
 npx skills add dartmouth/dartmouth-skills --list
 npx skills add dartmouth/dartmouth-skills@dartmouth-chat
 npx skills add dartmouth/dartmouth-skills@dartmouth-chat -g   # global: ~/.agents/skills/
